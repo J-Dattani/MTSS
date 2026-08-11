@@ -1,4 +1,4 @@
-# Multi-Tenant Society Suite 
+# Multi-Tenant Society Suite updated
 
 Multi-Tenant Society Suite is a cloud-based, end-to-end housing society management platform built with ASP.NET Core MVC and SQL Server. It helps societies manage maintenance billing, online payments, complaints, visitor logs, parking, facility bookings, accounting, audits, and resident communication in one secure shared system.
 

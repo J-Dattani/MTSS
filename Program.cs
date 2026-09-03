@@ -1,7 +1,8 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MTSS.Data;
 using MTSS.Models;
+using MTSS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,37 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+});
+
 builder.Services.AddControllersWithViews();
+
+// Register the SubscriptionPlanService for dependency injection
+builder.Services.AddScoped<SubscriptionPlanService>();
 
 var app = builder.Build();
 
@@ -37,7 +68,8 @@ app.MapControllerRoute(
 
 using (var scope = app.Services.CreateScope())
 {
-    await IdentitySeeder.SeedRolesAsync(scope.ServiceProvider);
+    await IdentitySeeder.SeedRolesAsync(
+        scope.ServiceProvider,
+        builder.Configuration);
 }
-
 app.Run();

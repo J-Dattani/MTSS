@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTSS.Data;
+using MTSS.DTOs.SubscriptionPlan;
 using MTSS.Models;
 
 namespace MTSS.Services
@@ -27,27 +28,37 @@ namespace MTSS.Services
         }
 
         //Buiness logic for creating a subscription plan
-        public async Task<SubscriptionPlan> CreateAsync(SubscriptionPlan plan)
+        public async Task<SubscriptionPlan> CreateAsync(CreateSubscriptionPlanRequest request)
         {
-            if (string.IsNullOrWhiteSpace(plan.Name))
-            {
+            if (string.IsNullOrWhiteSpace(request.Name))
                 throw new ArgumentException("Plan name is required.");
-            }
 
-            if (plan.MaxWings < 0 ||
-                plan.MaxFloorsPerWing < 0 ||
-                plan.MaxFlats < 0 ||
-                plan.MaxAmenities < 0 ||
-                plan.MaxSocietyAdmins < 0)
-            {
+            if (request.MaxWings < 0 ||
+                request.MaxFloorsPerWing < 0 ||
+                request.MaxFlats < 0 ||
+                request.MaxAmenities < 0 ||
+                request.MaxSocietyAdmins < 0)
                 throw new ArgumentException("Plan limits cannot be negative.");
-            }
 
-            plan.SubscriptionPlanId = 0;
-            plan.CreatedAt = DateTime.UtcNow;
-            plan.IsActive = true;
+            var plan = new SubscriptionPlan
+            {
+                Name = request.Name.Trim(),
+                MaxWings = request.MaxWings,
+                MaxFloorsPerWing = request.MaxFloorsPerWing,
+                MaxFlats = request.MaxFlats,
+                MaxAmenities = request.MaxAmenities,
+                MaxSocietyAdmins = request.MaxSocietyAdmins,
+                GuestApprovalEnabled = request.GuestApprovalEnabled,
+                ParcelRegisterEnabled = request.ParcelRegisterEnabled,
+                AmenityPinEnabled = request.AmenityPinEnabled,
+                ComplaintManagementEnabled = request.ComplaintManagementEnabled,
+                ReportsEnabled = request.ReportsEnabled,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
 
             _context.SubscriptionPlans.Add(plan);
+
             await _context.SaveChangesAsync();
 
             return plan;

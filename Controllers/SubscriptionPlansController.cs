@@ -49,5 +49,47 @@ namespace MTSS.Controllers
                 data = response
             });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateSubscriptionPlanRequest request)
+        {
+            try
+            {
+                var plan = await _service.CreateAsync(request);
+
+                var response = new SubscriptionPlanResponse
+                {
+                    SubscriptionPlanId = plan.SubscriptionPlanId,
+                    Name = plan.Name,
+                    MaxWings = plan.MaxWings,
+                    MaxFloorsPerWing = plan.MaxFloorsPerWing,
+                    MaxFlats = plan.MaxFlats,
+                    MaxAmenities = plan.MaxAmenities,
+                    MaxSocietyAdmins = plan.MaxSocietyAdmins,
+                    GuestApprovalEnabled = plan.GuestApprovalEnabled,
+                    ParcelRegisterEnabled = plan.ParcelRegisterEnabled,
+                    AmenityPinEnabled = plan.AmenityPinEnabled,
+                    ComplaintManagementEnabled = plan.ComplaintManagementEnabled,
+                    ReportsEnabled = plan.ReportsEnabled,
+                    IsActive = plan.IsActive,
+                    CreatedAt = plan.CreatedAt
+                };
+
+                return StatusCode(201, new
+                {
+                    success = true,
+                    message = "Subscription plan created successfully.",
+                    data = response
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
     }
 }

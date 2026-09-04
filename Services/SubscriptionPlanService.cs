@@ -66,8 +66,8 @@ namespace MTSS.Services
 
         //Business logic for updating a subscription plan
         public async Task<SubscriptionPlan> UpdateAsync(
-    int id,
-    SubscriptionPlan updatedPlan)
+            int id,
+            UpdateSubscriptionPlanRequest request)
         {
             var existingPlan = await _context.SubscriptionPlans
                 .FirstOrDefaultAsync(p => p.SubscriptionPlanId == id);
@@ -77,31 +77,31 @@ namespace MTSS.Services
                 throw new KeyNotFoundException("Subscription plan not found.");
             }
 
-            if (string.IsNullOrWhiteSpace(updatedPlan.Name))
+            if (string.IsNullOrWhiteSpace(request.Name))
             {
                 throw new ArgumentException("Plan name is required.");
             }
 
-            if (updatedPlan.MaxWings < 0 ||
-                updatedPlan.MaxFloorsPerWing < 0 ||
-                updatedPlan.MaxFlats < 0 ||
-                updatedPlan.MaxAmenities < 0 ||
-                updatedPlan.MaxSocietyAdmins < 0)
+            if (request.MaxWings < 0 ||
+                request.MaxFloorsPerWing < 0 ||
+                request.MaxFlats < 0 ||
+                request.MaxAmenities < 0 ||
+                request.MaxSocietyAdmins < 0)
             {
                 throw new ArgumentException("Plan limits cannot be negative.");
             }
 
-            existingPlan.Name = updatedPlan.Name;
-            existingPlan.MaxWings = updatedPlan.MaxWings;
-            existingPlan.MaxFloorsPerWing = updatedPlan.MaxFloorsPerWing;
-            existingPlan.MaxFlats = updatedPlan.MaxFlats;
-            existingPlan.MaxAmenities = updatedPlan.MaxAmenities;
-            existingPlan.MaxSocietyAdmins = updatedPlan.MaxSocietyAdmins;
-            existingPlan.GuestApprovalEnabled = updatedPlan.GuestApprovalEnabled;
-            existingPlan.ParcelRegisterEnabled = updatedPlan.ParcelRegisterEnabled;
-            existingPlan.AmenityPinEnabled = updatedPlan.AmenityPinEnabled;
-            existingPlan.ComplaintManagementEnabled = updatedPlan.ComplaintManagementEnabled;
-            existingPlan.ReportsEnabled = updatedPlan.ReportsEnabled;
+            existingPlan.Name = request.Name.Trim();
+            existingPlan.MaxWings = request.MaxWings;
+            existingPlan.MaxFloorsPerWing = request.MaxFloorsPerWing;
+            existingPlan.MaxFlats = request.MaxFlats;
+            existingPlan.MaxAmenities = request.MaxAmenities;
+            existingPlan.MaxSocietyAdmins = request.MaxSocietyAdmins;
+            existingPlan.GuestApprovalEnabled = request.GuestApprovalEnabled;
+            existingPlan.ParcelRegisterEnabled = request.ParcelRegisterEnabled;
+            existingPlan.AmenityPinEnabled = request.AmenityPinEnabled;
+            existingPlan.ComplaintManagementEnabled = request.ComplaintManagementEnabled;
+            existingPlan.ReportsEnabled = request.ReportsEnabled;
 
             await _context.SaveChangesAsync();
 
@@ -127,6 +127,32 @@ namespace MTSS.Services
 
             return existingPlan;
         }
+
+        // Business logic for deleting a subscription plan
+        public async Task<SubscriptionPlan> DeleteAsync(int id)
+        {
+            var existingPlan = await _context.SubscriptionPlans
+                .FirstOrDefaultAsync(p => p.SubscriptionPlanId == id);
+
+            if (existingPlan == null)
+            {
+                throw new KeyNotFoundException("Subscription plan not found.");
+            }
+
+            var hasSubscriptions = await _context.SocietySubscriptions
+                .AnyAsync(s => s.SubscriptionPlanId == id);
+
+            if (hasSubscriptions)
+            {
+                throw new InvalidOperationException(
+                    "Cannot delete a subscription plan that is assigned to a society.");
+            }
+
+            _context.SubscriptionPlans.Remove(existingPlan);
+
+            await _context.SaveChangesAsync();
+
+            return existingPlan;
+        }
     }
 }
-

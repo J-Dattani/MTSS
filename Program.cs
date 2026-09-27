@@ -46,6 +46,8 @@ builder.Services.AddControllersWithViews();
 // Register the SubscriptionPlanService for dependency injection
 builder.Services.AddScoped<SubscriptionPlanService>();
 builder.Services.AddScoped<SocietyService>();
+builder.Services.AddScoped<SocietySubscriptionService>();
+builder.Services.AddScoped<SocietyAdminService>();
 
 var app = builder.Build();
 

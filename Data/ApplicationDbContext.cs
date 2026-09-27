@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using MTSS.Data;
 using MTSS.Models;
 
 namespace MTSS.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
@@ -108,16 +108,9 @@ namespace MTSS.Data
                 .HasForeignKey(f => f.SocietyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Society → Subscription
+            // SocietySubscription → SubscriptionPlan
             modelBuilder.Entity<SocietySubscription>()
-                .HasOne<Society>()
-                .WithMany()
-                .HasForeignKey(s => s.SocietyId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // SubscriptionPlan → SocietySubscription
-            modelBuilder.Entity<SocietySubscription>()
-                .HasOne<SubscriptionPlan>()
+                .HasOne(s => s.SubscriptionPlan)
                 .WithMany()
                 .HasForeignKey(s => s.SubscriptionPlanId)
                 .OnDelete(DeleteBehavior.Restrict);

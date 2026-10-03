@@ -3,47 +3,287 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - MTSS</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MTSS.styles.css" asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/MTSS.styles.css"
+          asp-append-version="true" />
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MTSS</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+    <div class="mtss-app">
+
+        <!-- =========================
+             SIDEBAR
+        ========================== -->
+        <aside class="mtss-sidebar" id="mtssSidebar">
+
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    M
+                </div>
+
+                <div class="brand-text">
+                    <div class="brand-name">MTSS</div>
+                    <div class="brand-subtitle">Society Management</div>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+
+                <div class="nav-section-title">
+                    MAIN
+                </div>
+
+                <a href="/"
+                   class="sidebar-link active">
+
+                    <span class="sidebar-icon">⌂</span>
+                    <span>Dashboard</span>
+
+                </a>
+
+
+                <a href="#"
+                   class="sidebar-link static-nav-link">
+
+                    <span class="sidebar-icon">▦</span>
+                    <span>Societies</span>
+
+                </a>
+
+
+                <div class="nav-section-title">
+                    MANAGEMENT
+                </div>
+
+
+                <a href="#"
+                   class="sidebar-link static-nav-link">
+
+                    <span class="sidebar-icon">▤</span>
+                    <span>Subscription Plans</span>
+
+                </a>
+
+
+                <a href="#"
+                   class="sidebar-link static-nav-link">
+
+                    <span class="sidebar-icon">◫</span>
+                    <span>Subscriptions</span>
+
+                </a>
+
+
+                <div class="nav-section-title">
+                    SYSTEM
+                </div>
+
+
+                <a href="#"
+                   class="sidebar-link static-nav-link">
+
+                    <span class="sidebar-icon">⚙</span>
+                    <span>Settings</span>
+
+                </a>
+
+            </nav>
+
+
+            <!-- Sidebar Bottom -->
+            <div class="sidebar-footer">
+
+                <div class="sidebar-footer-card">
+
+                    <div class="footer-status-dot"></div>
+
+                    <div>
+                        <div class="footer-status-title">
+                            System Status
+                        </div>
+
+                        <div class="footer-status-text">
+                            Static UI Mode
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =========================
+             MAIN AREA
+        ========================== -->
+        <div class="mtss-main">
+
+
+            <!-- =========================
+                 TOPBAR
+            ========================== -->
+            <header class="mtss-topbar">
+
+                <div class="topbar-left">
+
+                    <button type="button"
+                            class="sidebar-toggle"
+                            id="sidebarToggle"
+                            aria-label="Toggle navigation">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </button>
+
+
+                    <div class="topbar-page-info">
+
+                        <div class="topbar-label">
+                            MANAGEMENT PORTAL
+                        </div>
+
+                        <div class="topbar-title">
+                            @ViewData["Title"]
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="topbar-right">
+
+                    <!-- Notification -->
+                    <button type="button"
+                            class="topbar-icon-button"
+                            aria-label="Notifications">
+
+                        <span>♢</span>
+
+                        <span class="notification-badge">
+                            3
+                        </span>
+
+                    </button>
+
+
+                    <!-- User -->
+                    <div class="topbar-user">
+
+                        <div class="user-avatar">
+                            SA
+                        </div>
+
+                        <div class="user-info">
+
+                            <div class="user-name">
+                                Super Admin
+                            </div>
+
+                            <div class="user-role">
+                                Platform Administrator
+                            </div>
+
+                        </div>
+
+                        <span class="user-dropdown-icon">
+                            ▾
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- =========================
+                 PAGE CONTENT
+            ========================== -->
+            <main class="mtss-content">
+
+                @RenderBody()
+
+            </main>
+
+
+            <!-- =========================
+                 FOOTER
+            ========================== -->
+            <footer class="mtss-footer">
+
+                <div>
+                    © 2026 MTSS
+                </div>
+
+                <div>
+                    Multi-Tenant Society Suite
+                </div>
+
+            </footer>
+
+        </div>
+
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - MTSS - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+    <!-- Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+        <div id="mtssToast"
+             class="toast"
+             role="alert"
+             aria-live="assertive"
+             aria-atomic="true">
+
+            <div class="toast-header">
+
+                <strong class="me-auto">
+                    MTSS
+                </strong>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="toast"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="toast-body"
+                 id="mtssToastMessage">
+                This feature is currently being developed.
+            </div>
+
         </div>
-    </footer>
+
+    </div>
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

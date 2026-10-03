@@ -1,0 +1,746 @@
+﻿@{
+    ViewData["Title"] = "SuperAdmin Dashboard";
+}
+
+<!-- =====================================================
+     SUPERADMIN DASHBOARD
+     Static UI - Mock Data
+     ===================================================== -->
+
+<div class="dashboard-page">
+
+    <!-- Page Header -->
+    <div class="dashboard-header">
+
+        <div>
+            <div class="page-eyebrow">
+                SUPERADMIN PORTAL
+            </div>
+
+            <h1 class="dashboard-title">
+                Dashboard
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Overview of societies, subscriptions and platform activity.
+            </p>
+        </div>
+
+        <div class="dashboard-header-actions">
+
+            <button type="button"
+                    class="btn btn-light dashboard-date-button">
+
+                <span>Today</span>
+                <span>▾</span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         STAT CARDS
+         ================================================= -->
+
+    <div class="row g-4 dashboard-stat-row">
+
+        <!-- Total Societies -->
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="dashboard-stat-card">
+
+                <div class="stat-card-top">
+
+                    <div class="stat-icon stat-icon-blue">
+                        ◫
+                    </div>
+
+                    <span class="stat-trend stat-trend-neutral">
+                        Platform
+                    </span>
+
+                </div>
+
+                <div class="stat-value">
+                    24
+                </div>
+
+                <div class="stat-label">
+                    Total Societies
+                </div>
+
+                <div class="stat-description">
+                    Registered on MTSS
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Active Societies -->
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="dashboard-stat-card">
+
+                <div class="stat-card-top">
+
+                    <div class="stat-icon stat-icon-green">
+                        ✓
+                    </div>
+
+                    <span class="stat-trend stat-trend-positive">
+                        Active
+                    </span>
+
+                </div>
+
+                <div class="stat-value">
+                    20
+                </div>
+
+                <div class="stat-label">
+                    Active Societies
+                </div>
+
+                <div class="stat-description">
+                    Currently operational
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Inactive Societies -->
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="dashboard-stat-card">
+
+                <div class="stat-card-top">
+
+                    <div class="stat-icon stat-icon-orange">
+                        ◷
+                    </div>
+
+                    <span class="stat-trend stat-trend-warning">
+                        Attention
+                    </span>
+
+                </div>
+
+                <div class="stat-value">
+                    4
+                </div>
+
+                <div class="stat-label">
+                    Inactive Societies
+                </div>
+
+                <div class="stat-description">
+                    Currently inactive
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Subscription Plans -->
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="dashboard-stat-card">
+
+                <div class="stat-card-top">
+
+                    <div class="stat-icon stat-icon-purple">
+                        ▤
+                    </div>
+
+                    <span class="stat-trend stat-trend-neutral">
+                        Available
+                    </span>
+
+                </div>
+
+                <div class="stat-value">
+                    6
+                </div>
+
+                <div class="stat-label">
+                    Subscription Plans
+                </div>
+
+                <div class="stat-description">
+                    Configured plans
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         MAIN DASHBOARD GRID
+         ================================================= -->
+
+    <div class="row g-4 mt-1">
+
+
+        <!-- =============================================
+             RECENT SOCIETIES
+             ============================================= -->
+
+        <div class="col-12 col-xl-8">
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2 class="panel-title">
+                            Recent Societies
+                        </h2>
+
+                        <p class="panel-subtitle">
+                            Recently registered societies on the platform.
+                        </p>
+
+                    </div>
+
+                    <a href="#"
+                       class="panel-action static-nav-link">
+                        View All
+                    </a>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="table dashboard-table align-middle">
+
+                        <thead>
+
+                            <tr>
+                                <th>Society</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th></th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="society-cell">
+
+                                        <div class="society-avatar">
+                                            SR
+                                        </div>
+
+                                        <div>
+                                            <div class="society-name">
+                                                Sunrise Residency
+                                            </div>
+
+                                            <div class="society-location">
+                                                Ahmedabad
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+                                    <span class="plan-badge">
+                                        Premium
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge status-active">
+                                        <span></span>
+                                        Active
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="table-muted">
+                                        24 Sep 2026
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button class="table-action-button"
+                                            type="button">
+                                        →
+                                    </button>
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="society-cell">
+
+                                        <div class="society-avatar avatar-purple">
+                                            GV
+                                        </div>
+
+                                        <div>
+                                            <div class="society-name">
+                                                Green Valley
+                                            </div>
+
+                                            <div class="society-location">
+                                                Ahmedabad
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+                                    <span class="plan-badge plan-standard">
+                                        Standard
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge status-active">
+                                        <span></span>
+                                        Active
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="table-muted">
+                                        22 Sep 2026
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button class="table-action-button"
+                                            type="button">
+                                        →
+                                    </button>
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="society-cell">
+
+                                        <div class="society-avatar avatar-orange">
+                                            RH
+                                        </div>
+
+                                        <div>
+                                            <div class="society-name">
+                                                Royal Heights
+                                            </div>
+
+                                            <div class="society-location">
+                                                Ahmedabad
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+                                    <span class="plan-badge plan-basic">
+                                        Basic
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        <span></span>
+                                        Inactive
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="table-muted">
+                                        20 Sep 2026
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button class="table-action-button"
+                                            type="button">
+                                        →
+                                    </button>
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="society-cell">
+
+                                        <div class="society-avatar avatar-green">
+                                            AP
+                                        </div>
+
+                                        <div>
+                                            <div class="society-name">
+                                                Anand Park
+                                            </div>
+
+                                            <div class="society-location">
+                                                Ahmedabad
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+                                    <span class="plan-badge">
+                                        Premium
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge status-active">
+                                        <span></span>
+                                        Active
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="table-muted">
+                                        18 Sep 2026
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button class="table-action-button"
+                                            type="button">
+                                        →
+                                    </button>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =============================================
+             SUBSCRIPTION OVERVIEW
+             ============================================= -->
+
+        <div class="col-12 col-xl-4">
+
+            <div class="dashboard-panel subscription-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2 class="panel-title">
+                            Subscription Overview
+                        </h2>
+
+                        <p class="panel-subtitle">
+                            Current plan distribution.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="subscription-list">
+
+
+                    <div class="subscription-item">
+
+                        <div class="subscription-info">
+
+                            <div class="subscription-dot dot-blue"></div>
+
+                            <div>
+                                <div class="subscription-name">
+                                    Premium
+                                </div>
+
+                                <div class="subscription-count">
+                                    8 societies
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="subscription-percentage">
+                            33%
+                        </div>
+
+                    </div>
+
+
+                    <div class="subscription-progress">
+
+                        <div class="progress">
+
+                            <div class="progress-bar"
+                                 style="width: 33%;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="subscription-item">
+
+                        <div class="subscription-info">
+
+                            <div class="subscription-dot dot-purple"></div>
+
+                            <div>
+                                <div class="subscription-name">
+                                    Standard
+                                </div>
+
+                                <div class="subscription-count">
+                                    10 societies
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="subscription-percentage">
+                            42%
+                        </div>
+
+                    </div>
+
+
+                    <div class="subscription-progress">
+
+                        <div class="progress">
+
+                            <div class="progress-bar progress-purple"
+                                 style="width: 42%;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="subscription-item">
+
+                        <div class="subscription-info">
+
+                            <div class="subscription-dot dot-orange"></div>
+
+                            <div>
+                                <div class="subscription-name">
+                                    Basic
+                                </div>
+
+                                <div class="subscription-count">
+                                    6 societies
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="subscription-percentage">
+                            25%
+                        </div>
+
+                    </div>
+
+
+                    <div class="subscription-progress">
+
+                        <div class="progress">
+
+                            <div class="progress-bar progress-orange"
+                                 style="width: 25%;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="subscription-footer">
+
+                    <span>
+                        Total active subscriptions
+                    </span>
+
+                    <strong>
+                        24
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         QUICK ACTIONS
+         ================================================= -->
+
+    <div class="dashboard-panel quick-actions-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2 class="panel-title">
+                    Quick Actions
+                </h2>
+
+                <p class="panel-subtitle">
+                    Common SuperAdmin tasks.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12 col-md-4">
+
+                <button type="button"
+                        class="quick-action-button static-nav-link">
+
+                    <span class="quick-action-icon">
+                        +
+                    </span>
+
+                    <span class="quick-action-content">
+
+                        <strong>
+                            Add Society
+                        </strong>
+
+                        <small>
+                            Register a new society
+                        </small>
+
+                    </span>
+
+                    <span class="quick-action-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="col-12 col-md-4">
+
+                <button type="button"
+                        class="quick-action-button static-nav-link">
+
+                    <span class="quick-action-icon">
+                        ▤
+                    </span>
+
+                    <span class="quick-action-content">
+
+                        <strong>
+                            Create Plan
+                        </strong>
+
+                        <small>
+                            Configure subscription plan
+                        </small>
+
+                    </span>
+
+                    <span class="quick-action-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="col-12 col-md-4">
+
+                <button type="button"
+                        class="quick-action-button static-nav-link">
+
+                    <span class="quick-action-icon">
+                        ◫
+                    </span>
+
+                    <span class="quick-action-content">
+
+                        <strong>
+                            Manage Subscriptions
+                        </strong>
+
+                        <small>
+                            Review society plans
+                        </small>
+
+                    </span>
+
+                    <span class="quick-action-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

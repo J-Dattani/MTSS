@@ -1,0 +1,831 @@
+﻿@{
+    ViewData["Title"] = "Society Subscriptions";
+}
+
+<div class="subscriptions-page">
+
+    <!-- Page Header -->
+    <div class="page-header-row">
+
+        <div>
+            <div class="page-eyebrow">
+                SUPERADMIN PORTAL
+            </div>
+
+            <h1 class="page-main-title">
+                Society Subscriptions
+            </h1>
+
+            <p class="page-main-subtitle">
+                Manage society subscription plans and their current status.
+            </p>
+        </div>
+
+        <div>
+            <button type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#assignSubscriptionModal">
+
+                <span class="me-1">+</span>
+                Assign Subscription
+
+            </button>
+        </div>
+
+    </div>
+
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-12 col-md-3">
+
+            <div class="subscription-summary-card">
+
+                <div class="subscription-summary-icon subscription-blue">
+                    ◫
+                </div>
+
+                <div>
+                    <div class="summary-value">
+                        24
+                    </div>
+
+                    <div class="summary-label">
+                        Total Subscriptions
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-3">
+
+            <div class="subscription-summary-card">
+
+                <div class="subscription-summary-icon subscription-green">
+                    ✓
+                </div>
+
+                <div>
+                    <div class="summary-value">
+                        20
+                    </div>
+
+                    <div class="summary-label">
+                        Active
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-3">
+
+            <div class="subscription-summary-card">
+
+                <div class="subscription-summary-icon subscription-orange">
+                    ◷
+                </div>
+
+                <div>
+                    <div class="summary-value">
+                        3
+                    </div>
+
+                    <div class="summary-label">
+                        Expiring Soon
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-3">
+
+            <div class="subscription-summary-card">
+
+                <div class="subscription-summary-icon subscription-red">
+                    !
+                </div>
+
+                <div>
+                    <div class="summary-value">
+                        1
+                    </div>
+
+                    <div class="summary-label">
+                        Expired
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Subscription Table -->
+    <div class="dashboard-panel">
+
+        <div class="subscriptions-toolbar">
+
+            <div class="subscription-search">
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search society or plan..." />
+
+            </div>
+
+
+            <div class="subscription-filters">
+
+                <select class="form-select">
+                    <option selected>All Status</option>
+                    <option>Active</option>
+                    <option>Expiring Soon</option>
+                    <option>Expired</option>
+                </select>
+
+                <select class="form-select">
+                    <option selected>All Plans</option>
+                    <option>Premium</option>
+                    <option>Standard</option>
+                    <option>Basic</option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="table subscriptions-table align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>Society</th>
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <!-- Subscription 1 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar">
+                                    SR
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Sunrise Residency
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="plan-badge">
+                                Premium
+                            </span>
+
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                01 Sep 2026
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                01 Sep 2027
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <span class="status-badge status-active">
+                                <span></span>
+                                Active
+                            </span>
+
+                        </td>
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light subscription-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#subscriptionDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Subscription 2 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar avatar-purple">
+                                    GV
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Green Valley
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="plan-badge plan-standard">
+                                Standard
+                            </span>
+
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                15 Sep 2026
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                15 Mar 2027
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <span class="status-badge status-active">
+                                <span></span>
+                                Active
+                            </span>
+
+                        </td>
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light subscription-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#subscriptionDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Subscription 3 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar avatar-orange">
+                                    RH
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Royal Heights
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="plan-badge plan-basic">
+                                Basic
+                            </span>
+
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                01 Apr 2026
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                10 Oct 2026
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <span class="status-badge status-inactive">
+                                <span></span>
+                                Expiring Soon
+                            </span>
+
+                        </td>
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light subscription-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#subscriptionDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Subscription 4 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar avatar-green">
+                                    AP
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Anand Park
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="plan-badge">
+                                Premium
+                            </span>
+
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                01 Jan 2026
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="table-muted">
+                                01 Jul 2026
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <span class="status-badge status-expired">
+                                <span></span>
+                                Expired
+                            </span>
+
+                        </td>
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light subscription-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#subscriptionDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- Pagination -->
+        <div class="society-pagination">
+
+            <div class="pagination-info">
+                Showing <strong>1–4</strong> of <strong>24</strong> subscriptions
+            </div>
+
+            <div class="pagination-buttons">
+
+                <button type="button"
+                        class="pagination-button"
+                        disabled>
+                    Previous
+                </button>
+
+                <button type="button"
+                        class="pagination-button active">
+                    1
+                </button>
+
+                <button type="button"
+                        class="pagination-button">
+                    2
+                </button>
+
+                <button type="button"
+                        class="pagination-button">
+                    3
+                </button>
+
+                <button type="button"
+                        class="pagination-button">
+                    Next
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ASSIGN SUBSCRIPTION MODAL
+     ===================================================== -->
+
+<div class="modal fade"
+     id="assignSubscriptionModal"
+     tabindex="-1"
+     aria-labelledby="assignSubscriptionModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h5 class="modal-title"
+                        id="assignSubscriptionModalLabel">
+
+                        Assign Subscription
+
+                    </h5>
+
+                    <p class="modal-subtitle">
+                        Assign a subscription plan to a society.
+                    </p>
+
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Society
+                    </label>
+
+                    <select class="form-select">
+
+                        <option selected>
+                            Select Society
+                        </option>
+
+                        <option>
+                            Sunrise Residency
+                        </option>
+
+                        <option>
+                            Green Valley
+                        </option>
+
+                        <option>
+                            Royal Heights
+                        </option>
+
+                        <option>
+                            Anand Park
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Subscription Plan
+                    </label>
+
+                    <select class="form-select">
+
+                        <option selected>
+                            Select Plan
+                        </option>
+
+                        <option>
+                            Premium
+                        </option>
+
+                        <option>
+                            Standard
+                        </option>
+
+                        <option>
+                            Basic
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="row g-3">
+
+                    <div class="col-6">
+
+                        <label class="form-label">
+                            Start Date
+                        </label>
+
+                        <input type="date"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="col-6">
+
+                        <label class="form-label">
+                            End Date
+                        </label>
+
+                        <input type="date"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary static-form-button">
+                    Assign Subscription
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SUBSCRIPTION DETAILS MODAL
+     ===================================================== -->
+
+<div class="modal fade"
+     id="subscriptionDetailsModal"
+     tabindex="-1"
+     aria-labelledby="subscriptionDetailsModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h5 class="modal-title"
+                        id="subscriptionDetailsModalLabel">
+
+                        Subscription Details
+
+                    </h5>
+
+                    <p class="modal-subtitle">
+                        Current subscription information.
+                    </p>
+
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="subscription-detail-header">
+
+                    <div class="society-avatar">
+                        SR
+                    </div>
+
+                    <div>
+
+                        <div class="subscription-detail-name">
+                            Sunrise Residency
+                        </div>
+
+                        <div class="subscription-detail-location">
+                            Ahmedabad
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="subscription-detail-grid">
+
+                    <div class="detail-card">
+
+                        <div class="detail-label">
+                            Plan
+                        </div>
+
+                        <div class="detail-value">
+                            Premium
+                        </div>
+
+                    </div>
+
+
+                    <div class="detail-card">
+
+                        <div class="detail-label">
+                            Status
+                        </div>
+
+                        <div class="detail-value">
+
+                            <span class="status-badge status-active">
+                                <span></span>
+                                Active
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="detail-card">
+
+                        <div class="detail-label">
+                            Start Date
+                        </div>
+
+                        <div class="detail-value">
+                            01 Sep 2026
+                        </div>
+
+                    </div>
+
+
+                    <div class="detail-card">
+
+                        <div class="detail-label">
+                            End Date
+                        </div>
+
+                        <div class="detail-value">
+                            01 Sep 2027
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+
+                <button type="button"
+                        class="btn btn-outline-primary static-form-button">
+                    Edit Subscription
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

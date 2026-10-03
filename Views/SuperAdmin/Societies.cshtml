@@ -1,0 +1,973 @@
+﻿@{
+    ViewData["Title"] = "Societies";
+}
+
+<div class="societies-page">
+
+    <!-- Page Header -->
+    <div class="page-header-row">
+
+        <div>
+            <div class="page-eyebrow">
+                SUPERADMIN PORTAL
+            </div>
+
+            <h1 class="page-main-title">
+                Societies
+            </h1>
+
+            <p class="page-main-subtitle">
+                Manage societies registered on the MTSS platform.
+            </p>
+        </div>
+
+        <div>
+            <button type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addSocietyModal">
+
+                <span class="me-1">+</span>
+                Add Society
+
+            </button>
+        </div>
+
+    </div>
+
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-12 col-md-4">
+
+            <div class="society-summary-card">
+
+                <div class="summary-icon summary-icon-blue">
+                    ◫
+                </div>
+
+                <div>
+                    <div class="summary-value">
+                        24
+                    </div>
+
+                    <div class="summary-label">
+                        Total Societies
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-4">
+
+            <div class="society-summary-card">
+
+                <div class="summary-icon summary-icon-green">
+                    ✓
+                </div>
+
+                <div>
+                    <div class="summary-value">
+                        20
+                    </div>
+
+                    <div class="summary-label">
+                        Active Societies
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-4">
+
+            <div class="society-summary-card">
+
+                <div class="summary-icon summary-icon-orange">
+                    ◷
+                </div>
+
+                <div>
+                    <div class="summary-value">
+                        4
+                    </div>
+
+                    <div class="summary-label">
+                        Inactive Societies
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Society Management Panel -->
+    <div class="dashboard-panel">
+
+        <!-- Search / Filters -->
+        <div class="society-toolbar">
+
+            <div class="society-search">
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search societies..." />
+
+            </div>
+
+
+            <div class="society-filters">
+
+                <select class="form-select">
+                    <option selected>All Status</option>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                </select>
+
+
+                <select class="form-select">
+                    <option selected>All Plans</option>
+                    <option>Premium</option>
+                    <option>Standard</option>
+                    <option>Basic</option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- Table -->
+        <div class="table-responsive">
+
+            <table class="table societies-table align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>Society</th>
+                        <th>Subscription Plan</th>
+                        <th>Society Admin</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+
+                    <!-- Society 1 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar">
+                                    SR
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Sunrise Residency
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            <span class="plan-badge">
+                                Premium
+                            </span>
+                        </td>
+
+
+                        <td>
+
+                            <div class="admin-name">
+                                Raj Patel
+                            </div>
+
+                            <div class="admin-email">
+                                admin@sunrise.example
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="status-badge status-active">
+                                <span></span>
+                                Active
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            <span class="table-muted">
+                                24 Sep 2026
+                            </span>
+                        </td>
+
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light society-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#societyDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Society 2 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar avatar-purple">
+                                    GV
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Green Valley
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            <span class="plan-badge plan-standard">
+                                Standard
+                            </span>
+                        </td>
+
+
+                        <td>
+
+                            <div class="admin-name">
+                                Neha Shah
+                            </div>
+
+                            <div class="admin-email">
+                                admin@greenvalley.example
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="status-badge status-active">
+                                <span></span>
+                                Active
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            <span class="table-muted">
+                                22 Sep 2026
+                            </span>
+                        </td>
+
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light society-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#societyDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Society 3 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar avatar-orange">
+                                    RH
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Royal Heights
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            <span class="plan-badge plan-basic">
+                                Basic
+                            </span>
+                        </td>
+
+
+                        <td>
+
+                            <div class="admin-name">
+                                Amit Joshi
+                            </div>
+
+                            <div class="admin-email">
+                                admin@royalheights.example
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="status-badge status-inactive">
+                                <span></span>
+                                Inactive
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            <span class="table-muted">
+                                20 Sep 2026
+                            </span>
+                        </td>
+
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light society-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#societyDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Society 4 -->
+                    <tr>
+
+                        <td>
+
+                            <div class="society-cell">
+
+                                <div class="society-avatar avatar-green">
+                                    AP
+                                </div>
+
+                                <div>
+
+                                    <div class="society-name">
+                                        Anand Park
+                                    </div>
+
+                                    <div class="society-location">
+                                        Ahmedabad
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            <span class="plan-badge">
+                                Premium
+                            </span>
+                        </td>
+
+
+                        <td>
+
+                            <div class="admin-name">
+                                Karan Mehta
+                            </div>
+
+                            <div class="admin-email">
+                                admin@anandpark.example
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="status-badge status-active">
+                                <span></span>
+                                Active
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            <span class="table-muted">
+                                18 Sep 2026
+                            </span>
+                        </td>
+
+
+                        <td class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-light society-view-button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#societyDetailsModal">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- Pagination -->
+        <div class="society-pagination">
+
+            <div class="pagination-info">
+                Showing <strong>1–4</strong> of <strong>24</strong> societies
+            </div>
+
+            <div class="pagination-buttons">
+
+                <button type="button"
+                        class="pagination-button"
+                        disabled>
+                    Previous
+                </button>
+
+                <button type="button"
+                        class="pagination-button active">
+                    1
+                </button>
+
+                <button type="button"
+                        class="pagination-button">
+                    2
+                </button>
+
+                <button type="button"
+                        class="pagination-button">
+                    3
+                </button>
+
+                <button type="button"
+                        class="pagination-button">
+                    Next
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ADD SOCIETY MODAL
+     ===================================================== -->
+
+<div class="modal fade"
+     id="addSocietyModal"
+     tabindex="-1"
+     aria-labelledby="addSocietyModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h5 class="modal-title"
+                        id="addSocietyModalLabel">
+
+                        Add Society
+
+                    </h5>
+
+                    <p class="modal-subtitle">
+                        Enter the basic details for the new society.
+                    </p>
+
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Society Name
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Enter society name" />
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Society Admin Name
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Enter admin name" />
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Admin Email
+                        </label>
+
+                        <input type="email"
+                               class="form-control"
+                               placeholder="Enter admin email" />
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Contact Number
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Enter contact number" />
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Subscription Plan
+                        </label>
+
+                        <select class="form-select">
+
+                            <option selected>
+                                Select Plan
+                            </option>
+
+                            <option>
+                                Premium
+                            </option>
+
+                            <option>
+                                Standard
+                            </option>
+
+                            <option>
+                                Basic
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Address
+                        </label>
+
+                        <textarea class="form-control"
+                                  rows="3"
+                                  placeholder="Enter society address"></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary static-form-button">
+
+                    Create Society
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SOCIETY DETAILS MODAL
+     ===================================================== -->
+
+<div class="modal fade"
+     id="societyDetailsModal"
+     tabindex="-1"
+     aria-labelledby="societyDetailsModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div class="society-modal-heading">
+
+                    <div class="society-avatar modal-avatar">
+                        SR
+                    </div>
+
+                    <div>
+
+                        <h5 class="modal-title"
+                            id="societyDetailsModalLabel">
+
+                            Sunrise Residency
+
+                        </h5>
+
+                        <div class="modal-society-location">
+                            Ahmedabad
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <div class="detail-card">
+
+                            <div class="detail-label">
+                                Subscription Plan
+                            </div>
+
+                            <div class="detail-value">
+                                Premium
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <div class="detail-card">
+
+                            <div class="detail-label">
+                                Status
+                            </div>
+
+                            <div class="detail-value">
+
+                                <span class="status-badge status-active">
+                                    <span></span>
+                                    Active
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <div class="detail-card">
+
+                            <div class="detail-label">
+                                Society Admin
+                            </div>
+
+                            <div class="detail-value">
+                                Raj Patel
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <div class="detail-card">
+
+                            <div class="detail-label">
+                                Admin Email
+                            </div>
+
+                            <div class="detail-value">
+                                admin@sunrise.example
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <div class="detail-card">
+
+                            <div class="detail-label">
+                                Address
+                            </div>
+
+                            <div class="detail-value">
+                                Sunrise Residency, Ahmedabad
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Quotas -->
+                <div class="society-quota-section">
+
+                    <h6 class="quota-title">
+                        Subscription Quotas
+                    </h6>
+
+                    <div class="row g-3">
+
+                        <div class="col-6 col-md-3">
+
+                            <div class="quota-card">
+
+                                <div class="quota-value">
+                                    5 / 10
+                                </div>
+
+                                <div class="quota-label">
+                                    Wings
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-6 col-md-3">
+
+                            <div class="quota-card">
+
+                                <div class="quota-value">
+                                    18 / 30
+                                </div>
+
+                                <div class="quota-label">
+                                    Floors
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-6 col-md-3">
+
+                            <div class="quota-card">
+
+                                <div class="quota-value">
+                                    120 / 200
+                                </div>
+
+                                <div class="quota-label">
+                                    Flats
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-6 col-md-3">
+
+                            <div class="quota-card">
+
+                                <div class="quota-value">
+                                    8 / 10
+                                </div>
+
+                                <div class="quota-label">
+                                    Amenities
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-outline-primary static-form-button">
+
+                    Edit Society
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-outline-danger static-form-button">
+
+                    Deactivate
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -49,6 +49,7 @@ builder.Services.AddScoped<SocietyService>();
 builder.Services.AddScoped<SocietySubscriptionService>();
 builder.Services.AddScoped<SocietyAdminService>();
 builder.Services.AddScoped<WingService>();
+builder.Services.AddScoped<FloorService>();
 
 var app = builder.Build();
 

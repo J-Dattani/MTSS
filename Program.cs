@@ -43,13 +43,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddControllersWithViews();
 
-// Register the SubscriptionPlanService for dependency injection
+// Register Services
 builder.Services.AddScoped<SubscriptionPlanService>();
 builder.Services.AddScoped<SocietyService>();
 builder.Services.AddScoped<SocietySubscriptionService>();
 builder.Services.AddScoped<SocietyAdminService>();
 builder.Services.AddScoped<WingService>();
 builder.Services.AddScoped<FloorService>();
+builder.Services.AddScoped<FlatService>();
 
 var app = builder.Build();
 

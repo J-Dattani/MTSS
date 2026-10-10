@@ -48,6 +48,7 @@ builder.Services.AddScoped<SubscriptionPlanService>();
 builder.Services.AddScoped<SocietyService>();
 builder.Services.AddScoped<SocietySubscriptionService>();
 builder.Services.AddScoped<SocietyAdminService>();
+builder.Services.AddScoped<WingService>();
 
 var app = builder.Build();
 

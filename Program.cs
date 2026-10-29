@@ -52,6 +52,7 @@ builder.Services.AddScoped<WingService>();
 builder.Services.AddScoped<FloorService>();
 builder.Services.AddScoped<FlatService>();
 builder.Services.AddScoped<ResidentService>();
+builder.Services.AddScoped<AmenityService>();
 
 var app = builder.Build();
 

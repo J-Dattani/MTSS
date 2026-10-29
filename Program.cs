@@ -53,6 +53,7 @@ builder.Services.AddScoped<FloorService>();
 builder.Services.AddScoped<FlatService>();
 builder.Services.AddScoped<ResidentService>();
 builder.Services.AddScoped<AmenityService>();
+builder.Services.AddScoped<GuestEntryService>();
 
 var app = builder.Build();
 

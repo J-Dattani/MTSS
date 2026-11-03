@@ -129,6 +129,13 @@ namespace MTSS.Data
                 .HasForeignKey(r => r.FlatId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ApplicationUser → ResidentProfile
+            modelBuilder.Entity<ResidentProfile>()
+                .HasOne(r => r.ApplicationUser)
+                .WithOne()
+                .HasForeignKey<ResidentProfile>(r => r.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Society → Amenity
             modelBuilder.Entity<Amenity>()
                 .HasOne<Society>()

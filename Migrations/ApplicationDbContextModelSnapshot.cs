@@ -501,6 +501,9 @@ namespace MTSS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ResidentProfileId"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -525,6 +528,10 @@ namespace MTSS.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ResidentProfileId");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique()
+                        .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.HasIndex("FlatId");
 
@@ -603,8 +610,6 @@ namespace MTSS.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("SocietySubscriptionId");
-
-                    b.HasIndex("SocietyId");
 
                     b.HasIndex("SubscriptionPlanId");
 
@@ -992,6 +997,11 @@ namespace MTSS.Migrations
 
             modelBuilder.Entity("MTSS.Models.ResidentProfile", b =>
                 {
+                    b.HasOne("MTSS.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne()
+                        .HasForeignKey("MTSS.Models.ResidentProfile", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MTSS.Models.Flat", null)
                         .WithMany()
                         .HasForeignKey("FlatId")
@@ -1003,21 +1013,19 @@ namespace MTSS.Migrations
                         .HasForeignKey("SocietyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("MTSS.Models.SocietySubscription", b =>
                 {
-                    b.HasOne("MTSS.Models.Society", null)
-                        .WithMany()
-                        .HasForeignKey("SocietyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MTSS.Models.SubscriptionPlan", null)
+                    b.HasOne("MTSS.Models.SubscriptionPlan", "SubscriptionPlan")
                         .WithMany()
                         .HasForeignKey("SubscriptionPlanId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("SubscriptionPlan");
                 });
 
             modelBuilder.Entity("MTSS.Models.Wing", b =>

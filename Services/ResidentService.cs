@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using MTSS.Data;
 using MTSS.DTOs.Resident;
 using MTSS.Models;
@@ -9,10 +10,14 @@ namespace MTSS.Services
     public class ResidentService
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ResidentService(ApplicationDbContext context)
+        public ResidentService(
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         private async Task<SubscriptionPlan> ValidateSocietyAccessAsync(
@@ -212,6 +217,150 @@ namespace MTSS.Services
                 await GetActiveFlatAsync(societyId, resident.FlatId);
 
             resident.IsActive = request.IsActive;
+
+            await _context.SaveChangesAsync();
+
+            return MapResponse(resident);
+        }
+
+        // Create a Resident Identity account and link it to the profile
+        public async Task<ResidentResponse> CreateAccountAsync(
+            int societyId,
+            int residentProfileId,
+            CreateResidentAccountRequest request)
+        {
+            await ValidateSocietyAccessAsync(societyId);
+
+            var resident = await _context.ResidentProfiles
+                .FirstOrDefaultAsync(r =>
+                    r.ResidentProfileId == residentProfileId &&
+                    r.SocietyId == societyId);
+
+            if (resident == null)
+                throw new KeyNotFoundException(
+                    "Resident profile not found in this society.");
+
+            if (!resident.IsActive)
+                throw new InvalidOperationException(
+                    "Inactive resident profiles cannot have accounts.");
+
+            await GetActiveFlatAsync(societyId, resident.FlatId);
+
+            if (!string.IsNullOrEmpty(resident.ApplicationUserId))
+                throw new InvalidOperationException(
+                    "This resident profile is already linked to an account.");
+
+            var email = request.Email.Trim();
+
+            var existingUser = await _userManager.FindByEmailAsync(email);
+
+            if (existingUser != null)
+                throw new InvalidOperationException(
+                    "An account with this email already exists.");
+
+            var user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                FullName = resident.FullName,
+                SocietyId = societyId,
+                IsActive = true,
+                EmailConfirmed = false
+            };
+
+            var createResult = await _userManager.CreateAsync(
+                user,
+                request.Password);
+
+            if (!createResult.Succeeded)
+            {
+                var errors = string.Join(
+                    "; ",
+                    createResult.Errors.Select(e => e.Description));
+
+                throw new ArgumentException(
+                    $"Resident account creation failed: {errors}");
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(
+                user,
+                "Resident");
+
+            if (!roleResult.Succeeded)
+            {
+                await _userManager.DeleteAsync(user);
+
+                var errors = string.Join(
+                    "; ",
+                    roleResult.Errors.Select(e => e.Description));
+
+                throw new InvalidOperationException(
+                    $"Resident role assignment failed: {errors}");
+            }
+
+            resident.ApplicationUserId = user.Id;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                await _userManager.DeleteAsync(user);
+                throw;
+            }
+
+            return MapResponse(resident);
+        }
+
+        // Link an existing Identity account to a resident profile
+        public async Task<ResidentResponse> LinkAccountAsync(
+            int societyId,
+            int residentProfileId,
+            LinkResidentAccountRequest request)
+        {
+            await ValidateSocietyAccessAsync(societyId);
+
+            var resident = await _context.ResidentProfiles
+                .FirstOrDefaultAsync(r =>
+                    r.ResidentProfileId == residentProfileId &&
+                    r.SocietyId == societyId);
+
+            if (resident == null)
+                throw new KeyNotFoundException(
+                    "Resident profile not found.");
+
+            if (!resident.IsActive)
+                throw new InvalidOperationException(
+                    "Inactive resident profiles cannot be linked.");
+
+            var user = await _userManager.FindByIdAsync(
+                request.ApplicationUserId.Trim());
+
+            if (user == null || !user.IsActive)
+                throw new ArgumentException(
+                    "Active application user not found.");
+
+            if (user.SocietyId != societyId)
+                throw new UnauthorizedAccessException(
+                    "Application user does not belong to this society.");
+
+            if (!await _userManager.IsInRoleAsync(user, "Resident"))
+                throw new ArgumentException(
+                    "Selected account does not have the Resident role.");
+
+            if (!string.IsNullOrEmpty(resident.ApplicationUserId))
+                throw new InvalidOperationException(
+                    "This resident profile is already linked to an account.");
+
+            var alreadyLinked = await _context.ResidentProfiles
+                .AnyAsync(r => r.ApplicationUserId == user.Id);
+
+            if (alreadyLinked)
+                throw new InvalidOperationException(
+                    "This application account is already linked to another resident.");
+
+            resident.ApplicationUserId = user.Id;
 
             await _context.SaveChangesAsync();
 

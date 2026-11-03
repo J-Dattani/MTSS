@@ -223,5 +223,85 @@ namespace MTSS.Controllers
                 return Conflict(new { success = false, message = ex.Message });
             }
         }
+
+        [HttpPost("{id:int}/create-account")]
+        public async Task<IActionResult> CreateAccount(
+    int id,
+    [FromBody] CreateResidentAccountRequest request)
+        {
+            var societyId = await GetCurrentSocietyIdAsync();
+
+            if (!societyId.HasValue)
+                return InvalidAdmin();
+            try
+            {
+                var data = await _residentService.CreateAccountAsync(
+                    societyId.Value, id, request);
+
+                return StatusCode(StatusCodes.Status201Created, new
+                {
+                    success = true,
+                    message = "Resident account created and linked successfully.",
+                    data
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { success = false, message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { success = false, message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        [HttpPatch("{id:int}/link-account")]
+        public async Task<IActionResult> LinkAccount(
+            int id,
+            [FromBody] LinkResidentAccountRequest request)
+        {
+            var societyId = await GetCurrentSocietyIdAsync();
+
+            if (!societyId.HasValue)
+                return InvalidAdmin();
+
+            try
+            {
+                var data = await _residentService.LinkAccountAsync(
+                    societyId.Value, id, request);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Resident account linked successfully.",
+                    data
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { success = false, message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { success = false, message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

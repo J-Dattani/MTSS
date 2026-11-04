@@ -289,6 +289,14 @@ namespace MTSS.Controllers
                     message = ex.Message
                 });
             }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(403, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
             catch (Exception)
             {
                 return StatusCode(500, new

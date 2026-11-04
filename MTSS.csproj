@@ -18,4 +18,8 @@
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.30" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="DTOs\Reports\NewFolder\" />
+	</ItemGroup>
+
 </Project>

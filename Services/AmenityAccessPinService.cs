@@ -284,6 +284,32 @@ namespace MTSS.Services
             ).ToListAsync();
         }
 
+        // SocietyAdmin: Get all amenity access logs in own society
+        public async Task<List<AmenityAccessLogResponse>> GetAccessLogsAsync(
+            int societyId)
+        {
+            await ValidateSocietyAccessAsync(societyId);
+
+            return await (
+                from log in _context.AmenityAccessLogs.AsNoTracking()
+                join amenity in _context.Amenities
+                    on log.AmenityId equals amenity.AmenityId
+                where log.SocietyId == societyId
+                orderby log.AttemptedAt descending
+                select new AmenityAccessLogResponse
+                {
+                    AmenityAccessLogId = log.AmenityAccessLogId,
+                    AmenityId = log.AmenityId,
+                    AmenityName = amenity.Name,
+                    FlatId = log.FlatId,
+                    ResidentProfileId = log.ResidentProfileId,
+                    IsSuccessful = log.IsSuccessful,
+                    AttemptedAt = log.AttemptedAt,
+                    FailureReason = log.FailureReason
+                }
+            ).ToListAsync();
+        }
+
         // SocietyAdmin: Validate PIN at amenity entrance
         public async Task<AmenityPinValidationResponse> ValidatePinAsync(
             int societyId,

@@ -183,6 +183,41 @@ namespace MTSS.Controllers
             }
         }
 
+        // SOCIETY ADMIN: Get amenity access logs
+        [Authorize(Roles = "SocietyAdmin")]
+        [HttpGet("societyadmin/amenity-access-logs")]
+        public async Task<IActionResult> GetAccessLogs()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user == null || !user.IsActive ||
+                    user.SocietyId == null)
+                {
+                    return Unauthorized(new
+                    {
+                        success = false,
+                        message = "Invalid or inactive society admin account."
+                    });
+                }
+
+                var result = await _service.GetAccessLogsAsync(
+                    user.SocietyId.Value);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Amenity access logs retrieved successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         // SOCIETY ADMIN: Validate PIN at amenity entrance
         [Authorize(Roles = "SocietyAdmin")]
         [HttpPost("societyadmin/amenity-pins/validate")]

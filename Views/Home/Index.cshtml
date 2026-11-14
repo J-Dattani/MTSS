@@ -1,8 +1,679 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "MTSS Portal";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section id="login-view" class="portal-login-wrap">
+    <div class="portal-card portal-login-card">
+        <div class="row g-0">
+            <div class="col-12 col-lg-5">
+                <div class="portal-login-aside">
+                    <div class="portal-eyebrow text-white-50">Multi-Tenant Society Management</div>
+                    <h2 class="mt-3 mb-3 fw-bold">One workspace for your community.</h2>
+                    <p>Sign in with your MTSS account to open the tools available for your role. Society operations and resident services use the documented live API.</p>
+                    <div class="small text-white-50 mt-4">The existing SuperAdmin screens are kept separate from this SocietyAdmin and Resident workspace.</div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-7 p-4 p-md-5">
+                <div class="portal-eyebrow">Secure sign in</div>
+                <h1 class="h3 fw-bold mt-2">Welcome back</h1>
+                <p class="portal-muted small mb-4">Use your own account details. This page does not save your password.</p>
+                <form id="login-form" autocomplete="on">
+                    <div class="mb-3">
+                        <label for="login-email" class="portal-field-label">Email address</label>
+                        <input id="login-email" name="email" class="form-control" type="email" autocomplete="username" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="portal-field-label">Password</label>
+                        <input id="login-password" name="password" class="form-control" type="password" autocomplete="current-password" required />
+                    </div>
+                    <button id="login-submit" class="btn btn-primary w-100 py-2 fw-semibold" type="submit">Sign in to MTSS</button>
+                </form>
+                <div id="login-message" class="portal-alert mt-3" role="status" hidden></div>
+                <div class="small portal-muted mt-4">API host: <span class="fw-semibold">mtss-backend.runasp.net</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="portal-view" hidden>
+    <div id="portal-message" class="portal-alert mb-3" role="status" hidden></div>
+    <div id="portal-heading" class="mb-4"></div>
+    <div id="portal-workspace"></div>
+</section>
+
+@section Scripts {
+<script>
+(() => {
+    "use strict";
+
+    const API_BASE = "https://mtss-backend.runasp.net";
+    const loginView = document.getElementById("login-view");
+    const portalView = document.getElementById("portal-view");
+    const loginForm = document.getElementById("login-form");
+    const loginMessage = document.getElementById("login-message");
+    const portalMessage = document.getElementById("portal-message");
+    const portalWorkspace = document.getElementById("portal-workspace");
+    const portalHeading = document.getElementById("portal-heading");
+    const nav = document.getElementById("portal-nav");
+    const navLabel = document.getElementById("portal-nav-label");
+    const userChip = document.getElementById("portal-user-chip");
+    const userName = document.getElementById("portal-user-name");
+    const userRole = document.getElementById("portal-user-role");
+    const userAvatar = document.getElementById("portal-user-avatar");
+
+    const societyPages = [
+        { key: "dashboard", label: "Dashboard", title: "Society overview", kind: "dashboard" },
+        { key: "wings", label: "Wings", title: "Wing management", endpoint: "/api/societyadmin/wings", createFields: [field("name", "Wing name")], editFields: [field("name", "Wing name")], status: { kind: "toggle", property: "isActive" }, columns: ["name", "isActive"] },
+        { key: "floors", label: "Floors", title: "Floor management", endpoint: "/api/societyadmin/floors", createFields: [field("wingId", "Wing ID", "number"), field("name", "Floor name"), field("floorNumber", "Floor number", "number")], editFields: [field("name", "Floor name"), field("floorNumber", "Floor number", "number")], status: { kind: "toggle", property: "isActive" }, columns: ["name", "floorNumber", "wingId", "isActive"] },
+        { key: "flats", label: "Flats", title: "Flat management", endpoint: "/api/societyadmin/flats", createFields: [field("floorId", "Floor ID", "number"), field("flatNumber", "Flat number")], editFields: [field("flatNumber", "Flat number"), field("isOccupied", "Occupied", "checkbox", false)], status: { kind: "toggle", property: "isActive" }, columns: ["flatNumber", "floorId", "isOccupied", "isActive"] },
+        { key: "residents", label: "Residents", title: "Resident management", endpoint: "/api/societyadmin/residents", createFields: [field("flatId", "Flat ID", "number"), field("fullName", "Full name"), field("mobileNumber", "Mobile number", "tel")], editFields: [field("fullName", "Full name"), field("mobileNumber", "Mobile number", "tel"), field("isHome", "Currently home", "checkbox", false)], status: { kind: "toggle", property: "isActive" }, columns: ["fullName", "mobileNumber", "flatId", "isHome", "isActive"], accountTools: true },
+        { key: "amenities", label: "Amenities", title: "Amenity management", endpoint: "/api/societyadmin/amenities", createFields: [field("name", "Amenity name"), field("description", "Description", "textarea", false), field("openingTime", "Opening time", "time"), field("closingTime", "Closing time", "time")], editFields: [field("name", "Amenity name"), field("description", "Description", "textarea", false), field("openingTime", "Opening time", "time"), field("closingTime", "Closing time", "time")], status: { kind: "toggle", property: "isActive" }, columns: ["name", "description", "openingTime", "closingTime", "isActive"] },
+        { key: "guests", label: "Guest entries", title: "Guest entry management", endpoint: "/api/societyadmin/guest-entries", createFields: [field("flatId", "Flat ID", "number"), field("residentProfileId", "Resident profile ID", "number"), field("guestName", "Guest name"), field("guestPhone", "Guest phone", "tel"), field("purpose", "Visit purpose")], status: { kind: "prompt", property: "status" }, columns: ["guestName", "guestPhone", "flatId", "purpose", "status"] },
+        { key: "parcels", label: "Parcels", title: "Parcel register", endpoint: "/api/societyadmin/parcels", createFields: [field("flatId", "Flat ID", "number"), field("residentProfileId", "Resident profile ID", "number"), field("courierName", "Courier"), field("trackingNumber", "Tracking number")], status: { kind: "prompt", property: "status" }, columns: ["courierName", "trackingNumber", "flatId", "status"] },
+        { key: "complaints", label: "Complaints", title: "Complaint management", endpoint: "/api/societyadmin/complaints", status: { kind: "complaint", property: "status" }, columns: ["subject", "description", "status", "adminRemarks"] },
+        { key: "notifications", label: "Notifications", title: "Society notifications", endpoint: "/api/societyadmin/notifications", createFields: [field("title", "Title"), field("message", "Message", "textarea"), field("type", "Type"), field("userId", "Resident user ID")], columns: ["title", "type", "userId", "message"] },
+        { key: "access", label: "Amenity access", title: "Amenity access and PINs", kind: "access" },
+        { key: "reports", label: "Reports", title: "Society reports", kind: "reports" }
+    ];
+
+    const residentPages = [
+        { key: "dashboard", label: "Dashboard", title: "Resident overview", kind: "dashboard" },
+        { key: "complaints", label: "My complaints", title: "My complaints", endpoint: "/api/resident/complaints", createFields: [field("subject", "Subject"), field("description", "Description", "textarea")], columns: ["subject", "description", "status", "createdAt"] },
+        { key: "notifications", label: "Notifications", title: "My notifications", endpoint: "/api/resident/notifications", columns: ["title", "message", "type", "isRead", "createdAt"], rowAction: { label: "Mark read", suffix: "/read", method: "PATCH" }, extraAction: { label: "Mark all read", path: "/api/resident/notifications/read-all", method: "PATCH" } },
+        { key: "pins", label: "Amenity PINs", title: "Amenity access PINs", endpoint: "/api/resident/amenity-pins", createFields: [field("amenityId", "Amenity ID", "number")], columns: ["amenityId", "pin", "status", "expiresAt", "isActive"], rowAction: { label: "Revoke", suffix: "/revoke", method: "PATCH" } },
+        { key: "resident-limits", label: "More services", title: "More resident services", kind: "limits" }
+    ];
+
+    const reports = [
+        { label: "Residents", path: "/api/societyadmin/reports/residents" },
+        { label: "Guest entries", path: "/api/societyadmin/reports/guest-entries" },
+        { label: "Parcels", path: "/api/societyadmin/reports/parcels" },
+        { label: "Complaints", path: "/api/societyadmin/reports/complaints" },
+        { label: "Amenity access", path: "/api/societyadmin/reports/amenity-access" }
+    ];
+
+    function field(name, label, type = "text", required = true) {
+        return { name, label, type, required };
+    }
+
+    function el(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined && text !== null) node.textContent = String(text);
+        return node;
+    }
+
+    function showMessage(target, message, kind = "info") {
+        target.textContent = message;
+        target.className = `portal-alert alert alert-${kind}`;
+        target.hidden = false;
+    }
+
+    function clearMessage(target) {
+        target.textContent = "";
+        target.hidden = true;
+    }
+
+    function dataOf(payload) {
+        return payload && Object.prototype.hasOwnProperty.call(payload, "data") ? payload.data : payload;
+    }
+
+    async function api(path, options = {}) {
+        let response;
+        try {
+            response = await fetch(`${API_BASE}${path}`, {
+                credentials: "include",
+                ...options,
+                headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) }
+            });
+        } catch {
+            throw new Error("The browser could not reach the API. The deployed site must allow this page's origin and session cookie.");
+        }
+
+        let payload = null;
+        try { payload = await response.json(); } catch { /* Some errors return no JSON body. */ }
+        if (!response.ok || (payload && payload.success === false)) {
+            throw new Error((payload && payload.message) || `The API returned ${response.status}.`);
+        }
+        return payload;
+    }
+
+    function rowsOf(payload) {
+        let data = dataOf(payload);
+        if (Array.isArray(data)) return data;
+        if (data && typeof data === "object") {
+            for (const key of ["items", "records", "results", "rows", "list"]) {
+                if (Array.isArray(data[key])) return data[key];
+            }
+            if (payload && (payload.success !== undefined || payload.message !== undefined) && data === payload.data) return [];
+            return [data];
+        }
+        return [];
+    }
+
+    function prop(row, key) {
+        if (!row || typeof row !== "object") return undefined;
+        const match = Object.keys(row).find(name => name.toLowerCase() === key.toLowerCase());
+        return match ? row[match] : undefined;
+    }
+
+    function idOf(row, entity) {
+        if (!row || typeof row !== "object") return null;
+        const exact = prop(row, "id");
+        if (exact !== undefined && exact !== null) return exact;
+        const preferred = {
+            wings: ["wingId"], floors: ["floorId"], flats: ["flatId"], residents: ["residentId", "residentProfileId"],
+            amenities: ["amenityId"], guests: ["guestEntryId", "guestEntryRequestId"], parcels: ["parcelId"],
+            complaints: ["complaintId"], notifications: ["notificationId"], pins: ["amenityAccessPinId", "pinId"]
+        }[entity] || [];
+        const idKey = preferred.map(name => Object.keys(row).find(key => key.toLowerCase() === name.toLowerCase())).find(Boolean)
+            || Object.keys(row).find(key => key.toLowerCase().endsWith("id"));
+        return idKey ? row[idKey] : null;
+    }
+
+    function displayValue(value) {
+        if (value === null || value === undefined || value === "") return "—";
+        if (typeof value === "boolean") return value ? "Yes" : "No";
+        if (typeof value === "object") return JSON.stringify(value);
+        return String(value);
+    }
+
+    function metricCard(label, value, note) {
+        const card = el("div", "portal-card p-3 h-100");
+        card.append(el("div", "portal-stat-value", value));
+        card.append(el("div", "portal-stat-label", label));
+        if (note) card.append(el("div", "small portal-muted mt-2", note));
+        return card;
+    }
+
+    function setHeading(title, subtitle) {
+        portalHeading.replaceChildren();
+        portalHeading.append(el("div", "portal-eyebrow", currentRole === "societyadmin" ? "SOCIETYADMIN PORTAL" : "RESIDENT PORTAL"));
+        portalHeading.append(el("h2", "portal-page-title", title));
+        portalHeading.append(el("p", "portal-page-subtitle", subtitle));
+    }
+
+    let currentRole = "";
+    let activePages = [];
+
+    function openPage(key) {
+        const page = activePages.find(item => item.key === key) || activePages[0];
+        nav.querySelectorAll("button[data-page]").forEach(button => button.classList.toggle("active", button.dataset.page === page.key));
+        portalWorkspace.replaceChildren();
+        if (page.kind === "dashboard") return renderDashboard(page);
+        if (page.kind === "reports") return renderReports(page);
+        if (page.kind === "access") return renderAccess(page);
+        if (page.kind === "limits") return renderServiceLimits(page);
+        renderModule(page);
+    }
+
+    function startPortal(role, identity) {
+        currentRole = role;
+        activePages = role === "societyadmin" ? societyPages : role === "resident" ? residentPages : [];
+        loginView.hidden = true;
+        portalView.hidden = false;
+        userChip.hidden = false;
+        const name = identity.fullName || identity.email || "MTSS user";
+        userName.textContent = name;
+        userRole.textContent = role === "societyadmin" ? "Society Administrator" : role === "resident" ? "Resident" : "SuperAdmin";
+        userAvatar.textContent = name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "M";
+        nav.replaceChildren();
+        navLabel.textContent = role === "societyadmin" ? "Society tools" : role === "resident" ? "Resident tools" : "Workspace";
+        if (role === "superadmin") {
+            nav.append(el("div", "portal-sidebar-note", "The completed SuperAdmin screens remain in their existing views. This workspace is for SocietyAdmin and Resident API workflows."));
+            setHeading("SuperAdmin sign in confirmed", "Your account authenticated successfully. The existing SuperAdmin static UI is preserved separately.");
+            portalWorkspace.append(el("div", "portal-card p-4", "No SuperAdmin screens were changed in this frontend pass."));
+            return;
+        }
+        for (const page of activePages) {
+            const button = el("button", "", page.label);
+            button.type = "button";
+            button.dataset.page = page.key;
+            button.addEventListener("click", () => openPage(page.key));
+            nav.append(button);
+        }
+        openPage("dashboard");
+    }
+
+    loginForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        clearMessage(loginMessage);
+        const button = document.getElementById("login-submit");
+        button.disabled = true;
+        button.textContent = "Signing in…";
+        const form = new FormData(loginForm);
+        try {
+            const payload = await api("/api/auth/login", {
+                method: "POST",
+                body: JSON.stringify({ email: form.get("email"), password: form.get("password") })
+            });
+            const identity = dataOf(payload) || {};
+            const roles = (identity.roles || payload.roles || []).map(item => typeof item === "string" ? item : (item.name || item.role || ""));
+            const normalized = roles.map(value => value.toLowerCase().replace(/[^a-z]/g, ""));
+            const role = normalized.includes("societyadmin") ? "societyadmin" : normalized.includes("resident") ? "resident" : normalized.includes("superadmin") ? "superadmin" : "";
+            if (!role) throw new Error("Login succeeded, but the response did not include a supported role.");
+            loginForm.reset();
+            clearMessage(portalMessage);
+            startPortal(role, identity);
+        } catch (error) {
+            showMessage(loginMessage, error.message || "Sign in failed. Check the account details and try again.", "danger");
+        } finally {
+            button.disabled = false;
+            button.textContent = "Sign in to MTSS";
+        }
+    });
+
+    function renderDashboard(page) {
+        const isSociety = currentRole === "societyadmin";
+        setHeading(page.title, isSociety ? "A live overview of the society operations available to your account." : "Your complaints, notifications, and amenity access in one place.");
+        const stats = isSociety
+            ? [
+                ["Wings", "/api/societyadmin/wings"], ["Floors", "/api/societyadmin/floors"], ["Flats", "/api/societyadmin/flats"],
+                ["Residents", "/api/societyadmin/residents"], ["Amenities", "/api/societyadmin/amenities"], ["Open complaints", "/api/societyadmin/complaints"]
+            ]
+            : [["My complaints", "/api/resident/complaints"], ["Notifications", "/api/resident/notifications"], ["Amenity PINs", "/api/resident/amenity-pins"]];
+        const grid = el("div", "row g-3 mb-4");
+        const placeholders = stats.map(([label]) => metricCard(label, "…", "Loading from API"));
+        for (const card of placeholders) {
+            const column = el("div", "col-12 col-sm-6 col-xl-4");
+            column.append(card);
+            grid.append(column);
+        }
+        portalWorkspace.append(grid);
+        const dashboardCard = isSociety ? { label: "Dashboard API", path: "/api/societyadmin/dashboard" } : null;
+        const calls = stats.map(([, path]) => api(path).then(rowsOf).then(rows => rows.length));
+        if (dashboardCard) calls.push(api(dashboardCard.path).then(() => null));
+        Promise.allSettled(calls).then(results => {
+            stats.forEach(([label], index) => {
+                const value = results[index].status === "fulfilled" ? results[index].value : "—";
+                const card = placeholders[index];
+                card.querySelector(".portal-stat-value").textContent = value;
+                card.querySelector(".portal-stat-label").textContent = label;
+                const note = card.querySelector(".small");
+                if (note) note.textContent = results[index].status === "fulfilled" ? "Records returned by the API" : "Unavailable for this session";
+            });
+            if (results.some(result => result.status === "rejected")) {
+                showMessage(portalMessage, "Some counts could not be loaded. Check the account role, cookie session, and API access, then use Refresh on a module page.", "warning");
+            } else {
+                clearMessage(portalMessage);
+            }
+        });
+        const lower = el("div", "row g-3");
+        const quick = isSociety ? ["wings", "floors", "flats", "residents", "amenities", "guests", "parcels", "complaints", "notifications", "access", "reports"] : ["complaints", "notifications", "pins", "resident-limits"];
+        for (const key of quick) {
+            const target = activePages.find(item => item.key === key);
+            if (!target) continue;
+            const wrap = el("div", "col-12 col-md-6 col-xl-4");
+            const card = el("button", "portal-card border-0 w-100 h-100 p-3 text-start");
+            card.type = "button";
+            card.append(el("div", "fw-bold", target.label), el("div", "small portal-muted mt-1", "Open this workspace"));
+            card.addEventListener("click", () => openPage(key));
+            wrap.append(card);
+            lower.append(wrap);
+        }
+        portalWorkspace.append(el("h3", "portal-section-title mb-3", "Quick access"), lower);
+    }
+
+    function pageShell(page, subtitle) {
+        setHeading(page.title, subtitle || "Manage records using the documented MTSS API contract.");
+        const toolbar = el("div", "d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3");
+        toolbar.append(el("div", "portal-section-note", "Live data is loaded after sign in. Empty results can be valid."));
+        const reload = el("button", "btn btn-sm btn-outline-secondary", "Refresh");
+        reload.type = "button";
+        toolbar.append(reload);
+        portalWorkspace.append(toolbar);
+        return reload;
+    }
+
+    function makeFieldInput(config) {
+        const wrapper = el("div", "portal-form-field");
+        const label = el("label", "portal-field-label", config.label);
+        label.htmlFor = `field-${config.name}`;
+        const input = config.type === "textarea" ? el("textarea", "form-control") : el("input", "form-control");
+        input.id = `field-${config.name}`;
+        input.name = config.name;
+        input.type = config.type === "textarea" ? "text" : config.type === "checkbox" ? "checkbox" : config.type;
+        if (input.tagName === "TEXTAREA") input.rows = 2;
+        input.required = config.required !== false && config.type !== "checkbox";
+        if (config.type === "checkbox") {
+            const line = el("div", "form-check pt-2");
+            input.className = "form-check-input";
+            label.className = "form-check-label ms-2 small fw-semibold";
+            line.append(input, label);
+            wrapper.append(line);
+        } else {
+            wrapper.append(label, input);
+        }
+        return { wrapper, input };
+    }
+
+    function buildForm(fields, title, onSubmit, options = {}) {
+        const card = el("div", "portal-card p-3 p-lg-4 mb-3");
+        card.append(el("h3", "portal-section-title mb-3", title));
+        const form = el("form", "row g-3");
+        const inputs = new Map();
+        for (const config of fields) {
+            const made = makeFieldInput(config);
+            made.wrapper.classList.add(config.type === "checkbox" ? "col-12" : "col-12 col-md-6 col-xl-4");
+            form.append(made.wrapper);
+            inputs.set(config.name, made.input);
+        }
+        const actions = el("div", "col-12 d-flex align-items-center gap-2");
+        const submit = el("button", "btn btn-primary btn-sm", options.submitText || "Save");
+        submit.type = "submit";
+        const cancel = el("button", "btn btn-light btn-sm", "Cancel edit");
+        cancel.type = "button";
+        cancel.hidden = true;
+        cancel.addEventListener("click", () => options.onCancel && options.onCancel());
+        actions.append(submit, cancel);
+        const note = el("span", "small portal-muted", "Passwords are sent only for this request and are not saved by this page.");
+        if (!fields.some(item => item.type === "password")) note.hidden = true;
+        actions.append(note);
+        form.append(actions);
+        const message = el("div", "portal-alert mt-3");
+        message.hidden = true;
+        card.append(form, message);
+        form.addEventListener("submit", event => {
+            event.preventDefault();
+            onSubmit(Object.fromEntries([...inputs].map(([name, input]) => [name, input.type === "checkbox" ? input.checked : input.value])), { form, inputs, submit, message, cancel });
+        });
+        return { card, form, inputs, submit, cancel, message };
+    }
+
+    function tableForRows(rows, columns, actionBuilder) {
+        const card = el("div", "portal-card overflow-hidden");
+        const responsive = el("div", "table-responsive");
+        const table = el("table", "table portal-table table-hover mb-0");
+        const thead = el("thead", "table-light");
+        const headRow = el("tr");
+        const resolvedColumns = columns && columns.length ? columns : rows.length ? Object.keys(rows[0]).filter(key => !/password|token|secret/i.test(key)).slice(0, 7).map(key => [key, key]) : [["id", "ID"]];
+        for (const column of resolvedColumns) headRow.append(el("th", "px-3 py-3", Array.isArray(column) ? column[1] : column));
+        if (actionBuilder) headRow.append(el("th", "px-3 py-3 text-end", "Actions"));
+        thead.append(headRow);
+        const tbody = el("tbody");
+        if (!rows.length) {
+            const tr = el("tr");
+            const td = el("td", "portal-empty", "No records returned. This may be an empty result for this society.");
+            td.colSpan = resolvedColumns.length + (actionBuilder ? 1 : 0);
+            tr.append(td);
+            tbody.append(tr);
+        } else {
+            for (const row of rows) {
+                const tr = el("tr");
+                for (const column of resolvedColumns) {
+                    const key = Array.isArray(column) ? column[0] : column;
+                    tr.append(el("td", "px-3 py-2", displayValue(prop(row, key))));
+                }
+                if (actionBuilder) {
+                    const td = el("td", "px-3 py-2 text-end");
+                    td.append(actionBuilder(row));
+                    tr.append(td);
+                }
+                tbody.append(tr);
+            }
+        }
+        table.append(thead, tbody);
+        responsive.append(table);
+        card.append(responsive);
+        return card;
+    }
+
+    async function loadRows(path, message) {
+        try {
+            const payload = await api(path);
+            return rowsOf(payload);
+        } catch (error) {
+            if (message) showMessage(message, error.message, "danger");
+            return null;
+        }
+    }
+
+    function renderModule(page) {
+        const reload = pageShell(page, page.key === "complaints" ? "Review resident reports and follow the allowed Open → InProgress → Resolved or Open → Rejected status paths." : undefined);
+        const body = el("div");
+        portalWorkspace.append(body);
+        let rows = [];
+        let editingId = null;
+        let activeForm = null;
+
+        const resetForm = () => {
+            editingId = null;
+            if (activeForm) {
+                activeForm.form.reset();
+                activeForm.cancel.hidden = true;
+                activeForm.submit.textContent = "Create record";
+                activeForm.card.querySelector("h3").textContent = `Create ${page.label || page.title}`;
+                clearMessage(activeForm.message);
+            }
+        };
+
+        const renderRows = () => {
+            const statusAction = page.status ? row => {
+                const group = el("div", "portal-action-row justify-content-end");
+                if (page.status.kind === "toggle") {
+                    const currentValue = prop(row, page.status.property);
+                    const active = currentValue === true || currentValue === 1 || String(currentValue).toLowerCase() === "true";
+                    const button = el("button", `btn btn-sm ${active ? "btn-outline-danger" : "btn-outline-success"}`, active ? "Deactivate" : "Activate");
+                    button.type = "button";
+                    button.addEventListener("click", async () => {
+                        try {
+                            await api(`${page.endpoint}/${encodeURIComponent(idOf(row, page.key))}/status`, { method: "PATCH", body: JSON.stringify({ [page.status.property]: !active }) });
+                            await refresh();
+                        } catch (error) { showMessage(portalMessage, error.message, "danger"); }
+                    });
+                    group.append(button);
+                } else {
+                    const button = el("button", "btn btn-sm btn-outline-primary", "Update status");
+                    button.type = "button";
+                    button.addEventListener("click", async () => {
+                        const nextStatus = window.prompt("Enter a status supported by the API:", displayValue(prop(row, page.status.property)) === "—" ? "" : String(prop(row, page.status.property)));
+                        if (!nextStatus) return;
+                        const body = { status: nextStatus };
+                        if (page.status.kind === "complaint") {
+                            body.adminRemarks = window.prompt("Admin remarks (optional):", "") || "";
+                        }
+                        try {
+                            await api(`${page.endpoint}/${encodeURIComponent(idOf(row, page.key))}/status`, { method: "PATCH", body: JSON.stringify(body) });
+                            await refresh();
+                        } catch (error) { showMessage(portalMessage, error.message, "danger"); }
+                    });
+                    group.append(button);
+                }
+                return group;
+            } : null;
+
+            const actionBuilder = row => {
+                const group = el("div", "portal-action-row justify-content-end");
+                if (page.editFields && page.editFields.length) {
+                    const edit = el("button", "btn btn-sm btn-outline-secondary", "Edit");
+                    edit.type = "button";
+                    edit.addEventListener("click", () => {
+                        editingId = idOf(row, page.key);
+                        activeForm.card.querySelector("h3").textContent = `Edit ${page.label || page.title}`;
+                        activeForm.submit.textContent = "Save changes";
+                        activeForm.cancel.hidden = false;
+                        for (const [name, input] of activeForm.inputs) {
+                            const value = prop(row, name);
+                            if (input.type === "checkbox") input.checked = Boolean(value);
+                            else input.value = value == null ? "" : String(value);
+                        }
+                        activeForm.card.scrollIntoView({ behavior: "smooth", block: "start" });
+                    });
+                    group.append(edit);
+                }
+                if (page.rowAction) {
+                    const action = el("button", "btn btn-sm btn-outline-primary", page.rowAction.label);
+                    action.type = "button";
+                    action.addEventListener("click", async () => {
+                        try {
+                            const id = idOf(row, page.key);
+                            await api(`${page.endpoint}/${encodeURIComponent(id)}${page.rowAction.suffix}`, { method: page.rowAction.method });
+                            await refresh();
+                        } catch (error) { showMessage(portalMessage, error.message, "danger"); }
+                    });
+                    group.append(action);
+                }
+                const status = statusAction && statusAction(row);
+                if (status) group.append(...status.childNodes);
+                return group.childNodes.length ? group : el("span", "portal-muted", "—");
+            };
+
+            const table = tableForRows(rows, page.columns, page.editFields || page.rowAction || page.status ? actionBuilder : null);
+            const old = body.querySelector(".module-table");
+            table.classList.add("module-table");
+            if (old) old.replaceWith(table); else body.append(table);
+        };
+
+        const refresh = async () => {
+            clearMessage(portalMessage);
+            const result = await loadRows(page.endpoint, portalMessage);
+            if (result !== null) rows = result;
+            renderRows();
+        };
+
+        reload.addEventListener("click", refresh);
+
+        if (page.createFields && page.createFields.length) {
+            const allFormFields = [...page.createFields];
+            for (const config of (page.editFields || [])) {
+                if (!allFormFields.some(item => item.name === config.name)) allFormFields.push(config);
+            }
+            activeForm = buildForm(allFormFields, `Create ${page.label || page.title}`, async (values, controls) => {
+                controls.submit.disabled = true;
+                try {
+                    const path = editingId !== null ? `${page.endpoint}/${encodeURIComponent(editingId)}` : page.endpoint;
+                    const method = editingId !== null ? "PUT" : "POST";
+                    const fields = editingId !== null ? (page.editFields || page.createFields) : page.createFields;
+                    const body = {};
+                    for (const config of fields) {
+                        const value = values[config.name];
+                        body[config.name] = config.type === "number" && value !== "" ? Number(value) : value;
+                    }
+                    await api(path, { method, body: JSON.stringify(body) });
+                    showMessage(controls.message, editingId !== null ? "Changes saved." : "Record created.", "success");
+                    resetForm();
+                    await refresh();
+                } catch (error) {
+                    showMessage(controls.message, error.message, "danger");
+                } finally {
+                    controls.submit.disabled = false;
+                }
+            }, { submitText: "Create record", onCancel: resetForm });
+            body.append(activeForm.card);
+        }
+
+        if (page.accountTools) {
+            const toolsRow = el("div", "row g-3 mb-3");
+            const accountForm = buildForm([field("residentId", "Resident profile ID", "number"), field("email", "Account email", "email"), field("password", "Temporary password", "password")], "Create resident account", async (values, controls) => {
+                controls.submit.disabled = true;
+                try {
+                    await api(`${page.endpoint}/${encodeURIComponent(values.residentId)}/create-account`, { method: "POST", body: JSON.stringify({ email: values.email, password: values.password }) });
+                    controls.form.reset();
+                    showMessage(controls.message, "Account request completed.", "success");
+                } catch (error) { showMessage(controls.message, error.message, "danger"); }
+                finally { controls.submit.disabled = false; }
+            }, { submitText: "Create account" });
+            const linkForm = buildForm([field("residentId", "Resident profile ID", "number"), field("applicationUserId", "Application user ID")], "Link an existing account", async (values, controls) => {
+                controls.submit.disabled = true;
+                try {
+                    await api(`${page.endpoint}/${encodeURIComponent(values.residentId)}/link-account`, { method: "PATCH", body: JSON.stringify({ applicationUserId: values.applicationUserId }) });
+                    controls.form.reset();
+                    showMessage(controls.message, "Account link request completed.", "success");
+                    await refresh();
+                } catch (error) { showMessage(controls.message, error.message, "danger"); }
+                finally { controls.submit.disabled = false; }
+            }, { submitText: "Link account" });
+            const left = el("div", "col-12 col-xl-6");
+            const right = el("div", "col-12 col-xl-6");
+            accountForm.card.classList.remove("mb-3");
+            linkForm.card.classList.remove("mb-3");
+            left.append(accountForm.card); right.append(linkForm.card);
+            toolsRow.append(left, right);
+            body.append(toolsRow);
+        }
+
+        if (page.extraAction) {
+            const action = el("button", "btn btn-sm btn-outline-primary mb-3", page.extraAction.label);
+            action.type = "button";
+            action.addEventListener("click", async () => {
+                try { await api(page.extraAction.path, { method: page.extraAction.method }); await refresh(); showMessage(portalMessage, "Notifications updated.", "success"); }
+                catch (error) { showMessage(portalMessage, error.message, "danger"); }
+            });
+            body.append(action);
+        }
+
+        refresh();
+    }
+
+    function renderAccess(page) {
+        const reload = pageShell(page, "Review access activity, inspect issued amenity PINs, or validate a PIN at the gate.");
+        const validation = buildForm([field("amenityId", "Amenity ID", "number"), field("pin", "PIN")], "Validate amenity PIN", async (values, controls) => {
+            controls.submit.disabled = true;
+            try {
+                const payload = await api("/api/societyadmin/amenity-pins/validate", { method: "POST", body: JSON.stringify({ amenityId: Number(values.amenityId), pin: values.pin }) });
+                const data = dataOf(payload);
+                showMessage(controls.message, payload.message || (data && data.message) || "PIN validation request completed.", "success");
+                controls.form.reset();
+            } catch (error) { showMessage(controls.message, error.message, "danger"); }
+            finally { controls.submit.disabled = false; }
+        }, { submitText: "Validate PIN" });
+        portalWorkspace.append(validation.card);
+        const grids = el("div", "row g-3");
+        const logColumn = el("div", "col-12");
+        const pinColumn = el("div", "col-12");
+        const logHeading = el("h3", "portal-section-title mb-2", "Amenity access logs");
+        const pinHeading = el("h3", "portal-section-title mb-2", "Issued amenity PINs");
+        const logBox = el("div"); const pinBox = el("div");
+        logColumn.append(logHeading, logBox); pinColumn.append(pinHeading, pinBox); grids.append(logColumn, pinColumn); portalWorkspace.append(grids);
+        const refresh = async () => {
+            const [logs, pins] = await Promise.all([
+                loadRows("/api/societyadmin/amenity-access-logs", portalMessage),
+                loadRows("/api/societyadmin/amenity-pins", portalMessage)
+            ]);
+            if (logs !== null) { logBox.replaceChildren(tableForRows(logs, null)); }
+            if (pins !== null) { pinBox.replaceChildren(tableForRows(pins, null)); }
+        };
+        reload.addEventListener("click", refresh);
+        refresh();
+    }
+
+    function renderReports(page) {
+        const reload = pageShell(page, "Each report is loaded from its documented endpoint when selected.");
+        const actions = el("div", "d-flex flex-wrap gap-2 mb-3");
+        const result = el("div");
+        let selectedReport = null;
+        async function loadReport(report, button) {
+            selectedReport = report;
+            clearMessage(portalMessage);
+            if (button) button.disabled = true;
+            try { result.replaceChildren(tableForRows(rowsOf(await api(report.path)), null)); }
+            catch (error) { showMessage(portalMessage, error.message, "danger"); result.replaceChildren(); }
+            finally { if (button) button.disabled = false; }
+        }
+        for (const report of reports) {
+            const button = el("button", "btn btn-outline-primary btn-sm", `Load ${report.label}`);
+            button.type = "button";
+            button.addEventListener("click", () => loadReport(report, button));
+            actions.append(button);
+        }
+        portalWorkspace.append(actions, result);
+        reload.addEventListener("click", () => selectedReport ? loadReport(selectedReport, reload) : showMessage(portalMessage, "Choose a report first.", "info"));
+    }
+
+    function renderServiceLimits(page) {
+        setHeading(page.title, "The supplied API contract does not include resident-facing routes for these actions yet.");
+        const card = el("div", "portal-card p-4");
+        card.append(el("h3", "portal-section-title mb-3", "Available resident API workflows"));
+        card.append(el("p", "small portal-muted", "This workspace currently supports resident complaints, notifications, and amenity PINs."));
+        card.append(el("h3", "portal-section-title mt-4 mb-3", "Awaiting documented resident endpoints"));
+        const list = el("ul", "small portal-muted mb-0");
+        ["Home or away status", "Guest approvals", "Parcel tracking", "Amenity access history"].forEach(item => list.append(el("li", "mb-2", item)));
+        card.append(list);
+        portalWorkspace.append(card);
+    }
+
+    document.getElementById("portal-user-chip").hidden = true;
+})();
+</script>
+}

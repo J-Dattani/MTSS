@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - MTSS</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        :root { color-scheme: light; --portal-ink: #17243b; --portal-muted: #718096; --portal-line: #e6ebf2; --portal-bg: #f4f7fb; --portal-blue: #3559d8; }
+        body { margin: 0; background: var(--portal-bg); color: var(--portal-ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+        .portal-frame { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr); }
+        .portal-sidebar { background: #101b31; color: #dce5f5; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
+        .portal-brand { display: flex; align-items: center; gap: 12px; padding: 0 10px; }
+        .portal-brand-mark { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; background: #4868e6; color: white; font-weight: 800; font-size: 20px; }
+        .portal-brand-title { color: #fff; font-size: 18px; font-weight: 750; letter-spacing: .02em; }
+        .portal-brand-subtitle { color: #98a8c3; font-size: 11px; }
+        .portal-nav-label { margin: 8px 10px 4px; color: #7f91b0; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+        .portal-nav { display: grid; gap: 5px; }
+        .portal-nav button { width: 100%; border: 0; border-radius: 10px; padding: 10px 12px; background: transparent; color: #c7d3e8; text-align: left; font-size: 13px; font-weight: 600; }
+        .portal-nav button:hover, .portal-nav button.active { background: #223252; color: white; }
+        .portal-nav button.active { box-shadow: inset 3px 0 #7891ff; }
+        .portal-sidebar-note { margin-top: auto; border: 1px solid #2a3b5d; border-radius: 13px; padding: 13px; color: #aebbd0; font-size: 11px; line-height: 1.5; }
+        .portal-main { min-width: 0; display: flex; flex-direction: column; }
+        .portal-topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px clamp(18px, 4vw, 42px); background: #fff; border-bottom: 1px solid var(--portal-line); }
+        .portal-topbar-kicker { color: var(--portal-muted); font-size: 10px; font-weight: 800; letter-spacing: .15em; }
+        .portal-topbar-title { margin: 2px 0 0; font-size: 18px; font-weight: 750; }
+        .portal-user-chip { display: flex; align-items: center; gap: 10px; color: var(--portal-muted); font-size: 12px; }
+        .portal-user-avatar { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: #e8edff; color: var(--portal-blue); font-weight: 800; }
+        .portal-main-content { width: 100%; max-width: 1480px; margin: 0 auto; padding: clamp(18px, 4vw, 42px); flex: 1; }
+        .portal-footer { padding: 16px clamp(18px, 4vw, 42px); display: flex; justify-content: space-between; gap: 12px; color: #8793a5; font-size: 11px; }
+        .portal-card { background: #fff; border: 1px solid var(--portal-line); border-radius: 16px; box-shadow: 0 7px 24px rgba(30, 51, 86, .035); }
+        .portal-page-title { margin: 4px 0 8px; font-size: clamp(24px, 3vw, 32px); font-weight: 780; letter-spacing: -.035em; }
+        .portal-page-subtitle { max-width: 720px; margin: 0; color: var(--portal-muted); font-size: 14px; line-height: 1.6; }
+        .portal-eyebrow { color: var(--portal-blue); font-size: 10px; font-weight: 850; letter-spacing: .16em; text-transform: uppercase; }
+        .portal-stat-value { font-size: 28px; font-weight: 800; letter-spacing: -.04em; }
+        .portal-stat-label { color: var(--portal-muted); font-size: 12px; font-weight: 650; }
+        .portal-section-title { margin: 0; font-size: 15px; font-weight: 750; }
+        .portal-section-note { margin: 5px 0 0; color: var(--portal-muted); font-size: 12px; }
+        .portal-table th { color: #718096; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+        .portal-table td { color: #26344b; font-size: 12px; vertical-align: middle; }
+        .portal-empty { padding: 34px 14px; color: var(--portal-muted); text-align: center; font-size: 13px; }
+        .portal-field-label { display: block; margin-bottom: 5px; color: #48566c; font-size: 11px; font-weight: 700; }
+        .portal-form-field { min-width: 0; }
+        .portal-alert { border-radius: 12px; padding: 11px 14px; font-size: 12px; }
+        .portal-action-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .portal-muted { color: var(--portal-muted); }
+        .portal-login-wrap { max-width: 980px; margin: 5vh auto; }
+        .portal-login-card { overflow: hidden; }
+        .portal-login-aside { min-height: 100%; padding: 36px; color: white; background: linear-gradient(145deg, #142544, #2e4a9d); }
+        .portal-login-aside p { color: #cad5f0; font-size: 13px; line-height: 1.65; }
+        @@media (max-width: 900px) { .portal-frame { grid-template-columns: 1fr; } .portal-sidebar { padding: 14px; } .portal-nav { display: flex; flex-wrap: wrap; } .portal-nav button { width: auto; } .portal-sidebar-note { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="portal-frame">
+        <aside class="portal-sidebar">
+            <div class="portal-brand">
+                <div class="portal-brand-mark">M</div>
+                <div><div class="portal-brand-title">MTSS</div><div class="portal-brand-subtitle">Society Management</div></div>
+            </div>
+            <div>
+                <div class="portal-nav-label" id="portal-nav-label">Workspace</div>
+                <nav class="portal-nav" id="portal-nav" aria-label="Portal navigation"></nav>
+            </div>
+            <div class="portal-sidebar-note">Your browser sends the session cookie to the documented MTSS API host. Use this portal on a trusted device.</div>
+        </aside>
+        <div class="portal-main">
+            <header class="portal-topbar">
+                <div><div class="portal-topbar-kicker">MTSS MANAGEMENT PORTAL</div><h1 class="portal-topbar-title">@ViewData["Title"]</h1></div>
+                <div class="portal-user-chip" id="portal-user-chip" hidden>
+                    <div class="portal-user-avatar" id="portal-user-avatar">M</div>
+                    <div><div class="fw-bold text-dark" id="portal-user-name">Signed in</div><div id="portal-user-role">MTSS user</div></div>
+                </div>
+            </header>
+            <main class="portal-main-content">@RenderBody()</main>
+            <footer class="portal-footer"><span>© 2026 MTSS</span><span>Multi-Tenant Society Management System</span></footer>
+        </div>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

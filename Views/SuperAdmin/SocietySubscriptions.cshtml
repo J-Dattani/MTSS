@@ -1,0 +1,222 @@
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "Society subscriptions";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <div class="portal-eyebrow">SUPERADMIN PORTAL</div>
+        <h2 class="portal-page-title">Society subscriptions</h2>
+        <p class="portal-page-subtitle">Assign a plan to a society, review its current term, or update its status.</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="/">Back to MTSS portal</a>
+</div>
+
+<div id="subscription-message" class="portal-alert mb-3" role="status" hidden></div>
+
+<section class="portal-card p-3 mb-3" aria-labelledby="society-lookup-title">
+    <h3 id="society-lookup-title" class="portal-section-title mb-3">Choose a society</h3>
+    <form id="society-lookup" class="row g-3 align-items-end">
+        <div class="col-12 col-md-5">
+            <label for="society-id" class="portal-field-label">Society ID</label>
+            <input id="society-id" class="form-control" type="number" min="1" required />
+        </div>
+        <div class="col-auto"><button class="btn btn-outline-primary btn-sm" type="submit">Load subscription</button></div>
+    </form>
+</section>
+
+<section id="subscription-current" class="mb-3" hidden></section>
+
+<div class="row g-3">
+    <div class="col-12 col-xl-7">
+        <section class="portal-card p-3 p-lg-4 h-100" aria-labelledby="subscription-form-title">
+            <h3 id="subscription-form-title" class="portal-section-title mb-3">Assign a subscription</h3>
+            <form id="subscription-form" class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="subscription-plan-id" class="portal-field-label">Subscription plan ID</label>
+                    <input id="subscription-plan-id" class="form-control" name="subscriptionPlanId" type="number" min="1" required />
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="subscription-start" class="portal-field-label">Start date</label>
+                    <input id="subscription-start" class="form-control" name="startDate" type="datetime-local" required />
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="subscription-end" class="portal-field-label">End date</label>
+                    <input id="subscription-end" class="form-control" name="endDate" type="datetime-local" required />
+                </div>
+                <div class="col-12"><button id="subscription-save" class="btn btn-primary btn-sm" type="submit">Assign subscription</button></div>
+            </form>
+        </section>
+    </div>
+    <div class="col-12 col-xl-5">
+        <section id="subscription-status-card" class="portal-card p-3 p-lg-4 h-100" aria-labelledby="subscription-status-title" hidden>
+            <h3 id="subscription-status-title" class="portal-section-title mb-3">Update status</h3>
+            <form id="subscription-status-form" class="row g-3">
+                <div class="col-12">
+                    <label for="subscription-status" class="portal-field-label">Status</label>
+                    <input id="subscription-status" class="form-control" name="status" required />
+                </div>
+                <div class="col-12 form-check ms-2">
+                    <input id="subscription-active" class="form-check-input" name="isActive" type="checkbox" />
+                    <label class="form-check-label small fw-semibold" for="subscription-active">Active</label>
+                </div>
+                <div class="col-12"><button class="btn btn-outline-primary btn-sm" type="submit">Save status</button></div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(() => {
+    "use strict";
+    const apiBase = "https://mtss-backend.runasp.net";
+    const lookup = document.getElementById("society-lookup");
+    const societyId = document.getElementById("society-id");
+    const form = document.getElementById("subscription-form");
+    const saveButton = document.getElementById("subscription-save");
+    const currentHost = document.getElementById("subscription-current");
+    const statusCard = document.getElementById("subscription-status-card");
+    const statusForm = document.getElementById("subscription-status-form");
+    const message = document.getElementById("subscription-message");
+    let current = null;
+
+    function notify(text, type = "info") {
+        message.textContent = text;
+        message.className = `portal-alert alert alert-${type}`;
+        message.hidden = false;
+    }
+
+    async function request(path, options = {}) {
+        let response;
+        try {
+            response = await fetch(`${apiBase}${path}`, {
+                credentials: "include",
+                ...options,
+                headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) }
+            });
+        } catch {
+            throw new Error("The browser could not reach the API. Check that the hosted API allows this site origin and cookie.");
+        }
+        let payload = null;
+        try { payload = await response.json(); } catch { /* Empty responses are allowed. */ }
+        if (!response.ok || (payload && payload.success === false)) {
+            const fieldErrors = payload && payload.errors && typeof payload.errors === "object"
+                ? Object.values(payload.errors).flatMap(value => Array.isArray(value) ? value : [value]).filter(Boolean).join(" ")
+                : "";
+            const error = new Error((payload && payload.message) || fieldErrors || (payload && payload.title) || `The API returned ${response.status}.`);
+            error.status = response.status;
+            throw error;
+        }
+        return payload;
+    }
+
+    function dataOf(payload) {
+        return payload && Object.prototype.hasOwnProperty.call(payload, "data") ? payload.data : payload;
+    }
+
+    function renderCurrent(item) {
+        currentHost.replaceChildren();
+        if (!item) {
+            currentHost.hidden = true;
+            statusCard.hidden = true;
+            return;
+        }
+        currentHost.hidden = false;
+        statusCard.hidden = false;
+        const card = document.createElement("div");
+        card.className = "portal-card p-3";
+        const title = document.createElement("h3");
+        title.className = "portal-section-title mb-3";
+        title.textContent = "Current subscription";
+        const row = document.createElement("div");
+        row.className = "row g-3";
+        const values = [
+            ["Plan", item.subscriptionPlanId], ["Starts", item.startDate], ["Ends", item.endDate],
+            ["Status", item.status], ["Active", item.isActive === true ? "Yes" : item.isActive === false ? "No" : item.isActive]
+        ];
+        for (const [labelText, value] of values) {
+            const column = document.createElement("div");
+            column.className = "col-6 col-md";
+            const label = document.createElement("div");
+            label.className = "portal-stat-label";
+            label.textContent = labelText;
+            const detail = document.createElement("div");
+            detail.className = "small fw-semibold mt-1";
+            detail.textContent = value == null || value === "" ? "—" : String(value);
+            column.append(label, detail);
+            row.append(column);
+        }
+        card.append(title, row);
+        currentHost.append(card);
+        statusForm.elements.status.value = item.status || "";
+        statusForm.elements.isActive.checked = item.isActive === true || item.isActive === 1 || String(item.isActive).toLowerCase() === "true";
+    }
+
+    async function loadCurrent() {
+        const id = societyId.value.trim();
+        if (!id) return;
+        const path = `/api/superadmin/societies/${encodeURIComponent(id)}/subscription`;
+        try {
+            const data = dataOf(await request(path));
+            current = Array.isArray(data) ? data[0] || null : data && typeof data === "object" ? data : null;
+            renderCurrent(current);
+            if (current) {
+                form.elements.subscriptionPlanId.value = current.subscriptionPlanId ?? "";
+                form.elements.startDate.value = current.startDate ? String(current.startDate).slice(0, 16) : "";
+                form.elements.endDate.value = current.endDate ? String(current.endDate).slice(0, 16) : "";
+                saveButton.textContent = "Update subscription";
+                notify("Subscription loaded.", "success");
+            } else {
+                form.reset();
+                saveButton.textContent = "Assign subscription";
+                notify("No current subscription was returned. You can assign one if the society ID is valid.", "info");
+            }
+        } catch (error) {
+            current = null;
+            renderCurrent(null);
+            form.reset();
+            saveButton.textContent = "Assign subscription";
+            notify(error.message, "warning");
+        }
+    }
+
+    lookup.addEventListener("submit", event => { event.preventDefault(); loadCurrent(); });
+
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+        if (!societyId.value.trim()) { notify("Load a society first.", "warning"); return; }
+        saveButton.disabled = true;
+        try {
+            const body = {
+                subscriptionPlanId: Number(form.elements.subscriptionPlanId.value),
+                startDate: form.elements.startDate.value,
+                endDate: form.elements.endDate.value
+            };
+            await request(`/api/superadmin/societies/${encodeURIComponent(societyId.value.trim())}/subscription`, {
+                method: current ? "PUT" : "POST", body: JSON.stringify(body)
+            });
+            notify(current ? "Subscription updated." : "Subscription assigned.", "success");
+            await loadCurrent();
+        } catch (error) { notify(error.message, "danger"); }
+        finally { saveButton.disabled = false; }
+    });
+
+    statusForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        if (!current || !societyId.value.trim()) return;
+        const button = statusForm.querySelector("button[type='submit']");
+        button.disabled = true;
+        try {
+            await request(`/api/superadmin/societies/${encodeURIComponent(societyId.value.trim())}/subscription/status`, {
+                method: "PATCH",
+                body: JSON.stringify({ status: statusForm.elements.status.value, isActive: statusForm.elements.isActive.checked })
+            });
+            notify("Subscription status updated.", "success");
+            await loadCurrent();
+        } catch (error) { notify(error.message, "danger"); }
+        finally { button.disabled = false; }
+    });
+})();
+</script>
+}

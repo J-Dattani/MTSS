@@ -46,7 +46,7 @@
                     MAIN
                 </div>
 
-                <a href="/"
+                <a href="/?section=dashboard"
                    class="sidebar-link active">
 
                     <span class="sidebar-icon">⌂</span>
@@ -55,8 +55,8 @@
                 </a>
 
 
-                <a href="#"
-                   class="sidebar-link static-nav-link">
+                <a href="/?section=societies"
+                   class="sidebar-link">
 
                     <span class="sidebar-icon">▦</span>
                     <span>Societies</span>
@@ -69,8 +69,8 @@
                 </div>
 
 
-                <a href="#"
-                   class="sidebar-link static-nav-link">
+                <a href="/?section=plans"
+                   class="sidebar-link">
 
                     <span class="sidebar-icon">▤</span>
                     <span>Subscription Plans</span>
@@ -78,8 +78,8 @@
                 </a>
 
 
-                <a href="#"
-                   class="sidebar-link static-nav-link">
+                <a href="/?section=subscriptions"
+                   class="sidebar-link">
 
                     <span class="sidebar-icon">◫</span>
                     <span>Subscriptions</span>
@@ -92,11 +92,11 @@
                 </div>
 
 
-                <a href="#"
-                   class="sidebar-link static-nav-link">
+                <a href="/?section=admins"
+                   class="sidebar-link">
 
                     <span class="sidebar-icon">⚙</span>
-                    <span>Settings</span>
+                    <span>Society Admins</span>
 
                 </a>
 
@@ -282,6 +282,29 @@
 
     <script src="~/js/site.js"
             asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener("click", function (event) {
+            const control = event.target.closest("[data-portal-section], .static-form-button");
+            if (!control) return;
+
+            const section = control.dataset.portalSection;
+            if (!section) return;
+
+            if (control.classList.contains("static-form-button")) {
+                const confirmed = window.confirm("This preview form does not save changes. Continue to the live workspace and enter the values there?");
+                if (!confirmed) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return;
+                }
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            window.location.assign(`/?section=${encodeURIComponent(section)}`);
+        }, true);
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

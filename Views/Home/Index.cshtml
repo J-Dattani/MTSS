@@ -11,7 +11,7 @@
                     <div class="portal-eyebrow text-white-50">Multi-Tenant Society Management</div>
                     <h2 class="mt-3 mb-3 fw-bold">One workspace for your community.</h2>
                     <p>Sign in with your MTSS account to open the tools available for your role. Society operations and resident services use the documented live API.</p>
-                    <div class="small text-white-50 mt-4">The existing SuperAdmin screens are kept separate from this SocietyAdmin and Resident workspace.</div>
+                    <div class="small text-white-50 mt-4">Your role determines which platform, society, or resident tools appear after sign in.</div>
                 </div>
             </div>
             <div class="col-12 col-lg-7 p-4 p-md-5">
@@ -69,9 +69,9 @@
         { key: "flats", label: "Flats", title: "Flat management", endpoint: "/api/societyadmin/flats", createFields: [field("floorId", "Floor ID", "number"), field("flatNumber", "Flat number")], editFields: [field("flatNumber", "Flat number"), field("isOccupied", "Occupied", "checkbox", false)], status: { kind: "toggle", property: "isActive" }, columns: ["flatNumber", "floorId", "isOccupied", "isActive"] },
         { key: "residents", label: "Residents", title: "Resident management", endpoint: "/api/societyadmin/residents", createFields: [field("flatId", "Flat ID", "number"), field("fullName", "Full name"), field("mobileNumber", "Mobile number", "tel")], editFields: [field("fullName", "Full name"), field("mobileNumber", "Mobile number", "tel"), field("isHome", "Currently home", "checkbox", false)], status: { kind: "toggle", property: "isActive" }, columns: ["fullName", "mobileNumber", "flatId", "isHome", "isActive"], accountTools: true },
         { key: "amenities", label: "Amenities", title: "Amenity management", endpoint: "/api/societyadmin/amenities", createFields: [field("name", "Amenity name"), field("description", "Description", "textarea", false), field("openingTime", "Opening time", "time"), field("closingTime", "Closing time", "time")], editFields: [field("name", "Amenity name"), field("description", "Description", "textarea", false), field("openingTime", "Opening time", "time"), field("closingTime", "Closing time", "time")], status: { kind: "toggle", property: "isActive" }, columns: ["name", "description", "openingTime", "closingTime", "isActive"] },
-        { key: "guests", label: "Guest entries", title: "Guest entry management", endpoint: "/api/societyadmin/guest-entries", createFields: [field("flatId", "Flat ID", "number"), field("residentProfileId", "Resident profile ID", "number"), field("guestName", "Guest name"), field("guestPhone", "Guest phone", "tel"), field("purpose", "Visit purpose")], status: { kind: "prompt", property: "status" }, columns: ["guestName", "guestPhone", "flatId", "purpose", "status"] },
-        { key: "parcels", label: "Parcels", title: "Parcel register", endpoint: "/api/societyadmin/parcels", createFields: [field("flatId", "Flat ID", "number"), field("residentProfileId", "Resident profile ID", "number"), field("courierName", "Courier"), field("trackingNumber", "Tracking number")], status: { kind: "prompt", property: "status" }, columns: ["courierName", "trackingNumber", "flatId", "status"] },
-        { key: "complaints", label: "Complaints", title: "Complaint management", endpoint: "/api/societyadmin/complaints", status: { kind: "complaint", property: "status" }, columns: ["subject", "description", "status", "adminRemarks"] },
+        { key: "guests", label: "Guest entries", title: "Guest entry management", endpoint: "/api/societyadmin/guest-entries", createFields: [field("flatId", "Flat ID", "number"), field("residentProfileId", "Resident profile ID", "number"), field("guestName", "Guest name"), field("guestPhone", "Guest phone", "tel"), field("purpose", "Visit purpose")], status: { property: "status", transitions: { pending: [{ value: "Approved", label: "Approve" }, { value: "Rejected", label: "Reject" }] } }, columns: ["guestName", "guestPhone", "flatId", "purpose", "status"] },
+        { key: "parcels", label: "Parcels", title: "Parcel register", endpoint: "/api/societyadmin/parcels", createFields: [field("flatId", "Flat ID", "number"), field("residentProfileId", "Resident profile ID", "number"), field("courierName", "Courier"), field("trackingNumber", "Tracking number")], status: { property: "status", transitions: { received: [{ value: "Collected", label: "Mark collected" }] } }, columns: ["courierName", "trackingNumber", "flatId", "status"] },
+        { key: "complaints", label: "Complaints", title: "Complaint management", endpoint: "/api/societyadmin/complaints", status: { property: "status", transitions: { open: [{ value: "InProgress", label: "Start progress" }, { value: "Rejected", label: "Reject" }], inprogress: [{ value: "Resolved", label: "Resolve" }, { value: "Rejected", label: "Reject" }] } }, columns: ["subject", "description", "status", "adminRemarks"] },
         { key: "notifications", label: "Notifications", title: "Society notifications", endpoint: "/api/societyadmin/notifications", createFields: [field("title", "Title"), field("message", "Message", "textarea"), field("type", "Type"), field("userId", "Resident user ID")], columns: ["title", "type", "userId", "message"] },
         { key: "access", label: "Amenity access", title: "Amenity access and PINs", kind: "access" },
         { key: "reports", label: "Reports", title: "Society reports", kind: "reports" }
@@ -85,6 +85,14 @@
         { key: "resident-limits", label: "More services", title: "More resident services", kind: "limits" }
     ];
 
+    const superAdminPages = [
+        { key: "dashboard", label: "Dashboard", title: "Platform overview", kind: "dashboard" },
+        { key: "societies", label: "Societies", title: "Society management", endpoint: "/api/superadmin/societies", createFields: [field("name", "Society name"), field("address", "Address"), field("city", "City"), field("state", "State"), field("pincode", "Pincode")], editFields: [field("name", "Society name"), field("address", "Address"), field("city", "City"), field("state", "State"), field("pincode", "Pincode")], status: { kind: "toggle", property: "isActive" }, columns: ["name", "city", "state", "pincode", "isActive"] },
+        { key: "plans", label: "Subscription plans", title: "Subscription plan management", endpoint: "/api/superadmin/subscription-plans", createFields: [field("name", "Plan name"), field("maxWings", "Maximum wings", "number"), field("maxFloorsPerWing", "Floors per wing", "number"), field("maxFlats", "Maximum flats", "number"), field("maxAmenities", "Maximum amenities", "number"), field("maxSocietyAdmins", "Society admins", "number"), field("guestApprovalEnabled", "Guest approval", "checkbox", false), field("parcelRegisterEnabled", "Parcel register", "checkbox", false), field("amenityPinEnabled", "Amenity PINs", "checkbox", false), field("complaintManagementEnabled", "Complaint management", "checkbox", false), field("reportsEnabled", "Reports", "checkbox", false)], editFields: [field("name", "Plan name"), field("maxWings", "Maximum wings", "number"), field("maxFloorsPerWing", "Floors per wing", "number"), field("maxFlats", "Maximum flats", "number"), field("maxAmenities", "Maximum amenities", "number"), field("maxSocietyAdmins", "Society admins", "number"), field("guestApprovalEnabled", "Guest approval", "checkbox", false), field("parcelRegisterEnabled", "Parcel register", "checkbox", false), field("amenityPinEnabled", "Amenity PINs", "checkbox", false), field("complaintManagementEnabled", "Complaint management", "checkbox", false), field("reportsEnabled", "Reports", "checkbox", false)], status: { kind: "toggle", property: "isActive" }, deleteRecord: true, columns: ["name", "maxWings", "maxFloorsPerWing", "maxFlats", "maxAmenities", "maxSocietyAdmins", "isActive"] },
+        { key: "admins", label: "Society admins", title: "Society administrator accounts", kind: "admins" },
+        { key: "subscriptions", label: "Society subscriptions", title: "Society subscriptions", kind: "subscriptions" }
+    ];
+
     const reports = [
         { label: "Residents", path: "/api/societyadmin/reports/residents" },
         { label: "Guest entries", path: "/api/societyadmin/reports/guest-entries" },
@@ -93,8 +101,8 @@
         { label: "Amenity access", path: "/api/societyadmin/reports/amenity-access" }
     ];
 
-    function field(name, label, type = "text", required = true) {
-        return { name, label, type, required };
+    function field(name, label, type = "text", required = true, constraints = {}) {
+        return { name, label, type, required, ...constraints };
     }
 
     function el(tag, className, text) {
@@ -134,7 +142,12 @@
         let payload = null;
         try { payload = await response.json(); } catch { /* Some errors return no JSON body. */ }
         if (!response.ok || (payload && payload.success === false)) {
-            throw new Error((payload && payload.message) || `The API returned ${response.status}.`);
+            const fieldErrors = payload && payload.errors && typeof payload.errors === "object"
+                ? Object.values(payload.errors).flatMap(value => Array.isArray(value) ? value : [value]).filter(Boolean).join(" ")
+                : "";
+            const error = new Error((payload && payload.message) || fieldErrors || (payload && payload.title) || `The API returned ${response.status}.`);
+            error.status = response.status;
+            throw error;
         }
         return payload;
     }
@@ -152,6 +165,18 @@
         return [];
     }
 
+    function reportRowsOf(payload) {
+        const data = dataOf(payload);
+        if (Array.isArray(data)) return data;
+        if (data && typeof data === "object") {
+            for (const key of ["items", "records", "results", "rows", "list"]) {
+                if (Array.isArray(data[key])) return data[key];
+            }
+            return Object.entries(data).map(([name, value]) => ({ name, value: displayValue(value) }));
+        }
+        return [];
+    }
+
     function prop(row, key) {
         if (!row || typeof row !== "object") return undefined;
         const match = Object.keys(row).find(name => name.toLowerCase() === key.toLowerCase());
@@ -165,7 +190,8 @@
         const preferred = {
             wings: ["wingId"], floors: ["floorId"], flats: ["flatId"], residents: ["residentId", "residentProfileId"],
             amenities: ["amenityId"], guests: ["guestEntryId", "guestEntryRequestId"], parcels: ["parcelId"],
-            complaints: ["complaintId"], notifications: ["notificationId"], pins: ["amenityAccessPinId", "pinId"]
+            complaints: ["complaintId"], notifications: ["notificationId"], pins: ["amenityAccessPinId", "pinId"],
+            admins: ["userId"], societies: ["societyId"], plans: ["subscriptionPlanId"]
         }[entity] || [];
         const idKey = preferred.map(name => Object.keys(row).find(key => key.toLowerCase() === name.toLowerCase())).find(Boolean)
             || Object.keys(row).find(key => key.toLowerCase().endsWith("id"));
@@ -189,7 +215,8 @@
 
     function setHeading(title, subtitle) {
         portalHeading.replaceChildren();
-        portalHeading.append(el("div", "portal-eyebrow", currentRole === "societyadmin" ? "SOCIETYADMIN PORTAL" : "RESIDENT PORTAL"));
+        const eyebrow = currentRole === "societyadmin" ? "SOCIETYADMIN PORTAL" : currentRole === "resident" ? "RESIDENT PORTAL" : "SUPERADMIN PORTAL";
+        portalHeading.append(el("div", "portal-eyebrow", eyebrow));
         portalHeading.append(el("h2", "portal-page-title", title));
         portalHeading.append(el("p", "portal-page-subtitle", subtitle));
     }
@@ -205,12 +232,14 @@
         if (page.kind === "reports") return renderReports(page);
         if (page.kind === "access") return renderAccess(page);
         if (page.kind === "limits") return renderServiceLimits(page);
+        if (page.kind === "admins") return renderSocietyAdmins(page);
+        if (page.kind === "subscriptions") return renderSubscriptions(page);
         renderModule(page);
     }
 
-    function startPortal(role, identity) {
+    function startPortal(role, identity, requestedPage) {
         currentRole = role;
-        activePages = role === "societyadmin" ? societyPages : role === "resident" ? residentPages : [];
+        activePages = role === "societyadmin" ? societyPages : role === "resident" ? residentPages : superAdminPages;
         loginView.hidden = true;
         portalView.hidden = false;
         userChip.hidden = false;
@@ -219,13 +248,7 @@
         userRole.textContent = role === "societyadmin" ? "Society Administrator" : role === "resident" ? "Resident" : "SuperAdmin";
         userAvatar.textContent = name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "M";
         nav.replaceChildren();
-        navLabel.textContent = role === "societyadmin" ? "Society tools" : role === "resident" ? "Resident tools" : "Workspace";
-        if (role === "superadmin") {
-            nav.append(el("div", "portal-sidebar-note", "The completed SuperAdmin screens remain in their existing views. This workspace is for SocietyAdmin and Resident API workflows."));
-            setHeading("SuperAdmin sign in confirmed", "Your account authenticated successfully. The existing SuperAdmin static UI is preserved separately.");
-            portalWorkspace.append(el("div", "portal-card p-4", "No SuperAdmin screens were changed in this frontend pass."));
-            return;
-        }
+        navLabel.textContent = role === "societyadmin" ? "Society tools" : role === "resident" ? "Resident tools" : "Platform tools";
         for (const page of activePages) {
             const button = el("button", "", page.label);
             button.type = "button";
@@ -233,7 +256,7 @@
             button.addEventListener("click", () => openPage(page.key));
             nav.append(button);
         }
-        openPage("dashboard");
+        openPage(activePages.some(item => item.key === requestedPage) ? requestedPage : "dashboard");
     }
 
     loginForm.addEventListener("submit", async event => {
@@ -255,7 +278,8 @@
             if (!role) throw new Error("Login succeeded, but the response did not include a supported role.");
             loginForm.reset();
             clearMessage(portalMessage);
-            startPortal(role, identity);
+            const requestedPage = new URLSearchParams(window.location.search).get("section");
+            startPortal(role, identity, requestedPage);
         } catch (error) {
             showMessage(loginMessage, error.message || "Sign in failed. Check the account details and try again.", "danger");
         } finally {
@@ -266,13 +290,16 @@
 
     function renderDashboard(page) {
         const isSociety = currentRole === "societyadmin";
-        setHeading(page.title, isSociety ? "A live overview of the society operations available to your account." : "Your complaints, notifications, and amenity access in one place.");
+        const isSuperAdmin = currentRole === "superadmin";
+        setHeading(page.title, isSociety ? "A live overview of the society operations available to your account." : isSuperAdmin ? "Manage societies, plans, administrator accounts, and subscriptions from the documented platform APIs." : "Your complaints, notifications, and amenity access in one place.");
         const stats = isSociety
             ? [
                 ["Wings", "/api/societyadmin/wings"], ["Floors", "/api/societyadmin/floors"], ["Flats", "/api/societyadmin/flats"],
                 ["Residents", "/api/societyadmin/residents"], ["Amenities", "/api/societyadmin/amenities"], ["Open complaints", "/api/societyadmin/complaints"]
             ]
-            : [["My complaints", "/api/resident/complaints"], ["Notifications", "/api/resident/notifications"], ["Amenity PINs", "/api/resident/amenity-pins"]];
+            : isSuperAdmin
+                ? [["Societies", "/api/superadmin/societies"], ["Subscription plans", "/api/superadmin/subscription-plans"]]
+                : [["My complaints", "/api/resident/complaints"], ["Notifications", "/api/resident/notifications"], ["Amenity PINs", "/api/resident/amenity-pins"]];
         const grid = el("div", "row g-3 mb-4");
         const placeholders = stats.map(([label]) => metricCard(label, "…", "Loading from API"));
         for (const card of placeholders) {
@@ -300,7 +327,7 @@
             }
         });
         const lower = el("div", "row g-3");
-        const quick = isSociety ? ["wings", "floors", "flats", "residents", "amenities", "guests", "parcels", "complaints", "notifications", "access", "reports"] : ["complaints", "notifications", "pins", "resident-limits"];
+        const quick = isSociety ? ["wings", "floors", "flats", "residents", "amenities", "guests", "parcels", "complaints", "notifications", "access", "reports"] : isSuperAdmin ? ["societies", "plans", "admins", "subscriptions"] : ["complaints", "notifications", "pins", "resident-limits"];
         for (const key of quick) {
             const target = activePages.find(item => item.key === key);
             if (!target) continue;
@@ -336,6 +363,11 @@
         input.type = config.type === "textarea" ? "text" : config.type === "checkbox" ? "checkbox" : config.type;
         if (input.tagName === "TEXTAREA") input.rows = 2;
         input.required = config.required !== false && config.type !== "checkbox";
+        if (config.pattern) input.pattern = config.pattern;
+        if (config.minLength !== undefined) input.minLength = config.minLength;
+        if (config.maxLength !== undefined) input.maxLength = config.maxLength;
+        if (config.inputMode) input.inputMode = config.inputMode;
+        if (config.title) input.title = config.title;
         if (config.type === "checkbox") {
             const line = el("div", "form-check pt-2");
             input.className = "form-check-input";
@@ -430,7 +462,7 @@
     }
 
     function renderModule(page) {
-        const reload = pageShell(page, page.key === "complaints" ? "Review resident reports and follow the allowed Open → InProgress → Resolved or Open → Rejected status paths." : undefined);
+        const reload = pageShell(page, page.key === "complaints" ? "Open complaints can move to In Progress or Rejected. In Progress complaints can move to Resolved or Rejected." : undefined);
         const body = el("div");
         portalWorkspace.append(body);
         let rows = [];
@@ -451,7 +483,31 @@
         const renderRows = () => {
             const statusAction = page.status ? row => {
                 const group = el("div", "portal-action-row justify-content-end");
-                if (page.status.kind === "toggle") {
+                if (page.status.transitions) {
+                    const currentStatus = String(prop(row, page.status.property) || "").trim().toLowerCase();
+                    const allowedTransitions = page.status.transitions[currentStatus] || [];
+                    for (const transition of allowedTransitions) {
+                        const button = el("button", `btn btn-sm ${transition.value === "Rejected" ? "btn-outline-danger" : "btn-outline-primary"}`, transition.label);
+                        button.type = "button";
+                        button.addEventListener("click", async () => {
+                            const body = { status: transition.value };
+                            if (page.key === "complaints") body.adminRemarks = prop(row, "adminRemarks") || "";
+                            if (page.key === "complaints" && transition.value === "Rejected") {
+                                const remarks = window.prompt("Admin remarks (optional):", body.adminRemarks);
+                                if (remarks === null) return;
+                                body.adminRemarks = remarks;
+                            }
+                            button.disabled = true;
+                            try {
+                                await api(`${page.endpoint}/${encodeURIComponent(idOf(row, page.key))}/status`, { method: "PATCH", body: JSON.stringify(body) });
+                                await refresh();
+                                showMessage(portalMessage, `${transition.label} completed.`, "success");
+                            } catch (error) { showMessage(portalMessage, error.message, "danger"); }
+                            finally { button.disabled = false; }
+                        });
+                        group.append(button);
+                    }
+                } else if (page.status.kind === "toggle") {
                     const currentValue = prop(row, page.status.property);
                     const active = currentValue === true || currentValue === 1 || String(currentValue).toLowerCase() === "true";
                     const button = el("button", `btn btn-sm ${active ? "btn-outline-danger" : "btn-outline-success"}`, active ? "Deactivate" : "Activate");
@@ -464,21 +520,7 @@
                     });
                     group.append(button);
                 } else {
-                    const button = el("button", "btn btn-sm btn-outline-primary", "Update status");
-                    button.type = "button";
-                    button.addEventListener("click", async () => {
-                        const nextStatus = window.prompt("Enter a status supported by the API:", displayValue(prop(row, page.status.property)) === "—" ? "" : String(prop(row, page.status.property)));
-                        if (!nextStatus) return;
-                        const body = { status: nextStatus };
-                        if (page.status.kind === "complaint") {
-                            body.adminRemarks = window.prompt("Admin remarks (optional):", "") || "";
-                        }
-                        try {
-                            await api(`${page.endpoint}/${encodeURIComponent(idOf(row, page.key))}/status`, { method: "PATCH", body: JSON.stringify(body) });
-                            await refresh();
-                        } catch (error) { showMessage(portalMessage, error.message, "danger"); }
-                    });
-                    group.append(button);
+                    return null;
                 }
                 return group;
             } : null;
@@ -513,6 +555,19 @@
                         } catch (error) { showMessage(portalMessage, error.message, "danger"); }
                     });
                     group.append(action);
+                }
+                if (page.deleteRecord) {
+                    const remove = el("button", "btn btn-sm btn-outline-danger", "Delete");
+                    remove.type = "button";
+                    remove.addEventListener("click", async () => {
+                        if (!window.confirm("Delete this subscription plan? This action cannot be undone.")) return;
+                        try {
+                            await api(`${page.endpoint}/${encodeURIComponent(idOf(row, page.key))}`, { method: "DELETE" });
+                            showMessage(portalMessage, "Subscription plan deleted.", "success");
+                            await refresh();
+                        } catch (error) { showMessage(portalMessage, error.message, "danger"); }
+                    });
+                    group.append(remove);
                 }
                 const status = statusAction && statusAction(row);
                 if (status) group.append(...status.childNodes);
@@ -606,9 +661,222 @@
         refresh();
     }
 
+    function renderSocietyAdmins(page) {
+        const reload = pageShell(page, "Choose a society, then manage its administrator accounts using the documented scoped routes.");
+        const scope = el("div", "portal-card p-3 mb-3");
+        const scopeRow = el("div", "row g-2 align-items-end");
+        const inputWrap = el("div", "col-12 col-md-5");
+        const societyInput = el("input", "form-control");
+        societyInput.type = "number";
+        societyInput.required = true;
+        societyInput.placeholder = "Society ID";
+        const societyLabel = el("label", "portal-field-label", "Society ID");
+        societyLabel.htmlFor = "superadmin-society-id";
+        societyInput.id = "superadmin-society-id";
+        inputWrap.append(societyLabel, societyInput);
+        const loadWrap = el("div", "col-12 col-md-auto");
+        const loadButton = el("button", "btn btn-outline-primary btn-sm", "Load administrators");
+        loadButton.type = "button";
+        loadWrap.append(loadButton);
+        scopeRow.append(inputWrap, loadWrap);
+        scope.append(scopeRow);
+        portalWorkspace.append(scope);
+
+        const formFields = [field("fullName", "Full name"), field("email", "Email address", "email"), field("password", "Temporary password", "password", false)];
+        let selectedSocietyId = "";
+        let editingUserId = null;
+        let rows = [];
+        let adminForm;
+        const tableHost = el("div");
+
+        const resetAdminForm = () => {
+            editingUserId = null;
+            if (!adminForm) return;
+            adminForm.form.reset();
+            adminForm.cancel.hidden = true;
+            adminForm.submit.textContent = "Create administrator";
+            adminForm.card.querySelector("h3").textContent = "Create society administrator";
+            clearMessage(adminForm.message);
+        };
+
+        adminForm = buildForm(formFields, "Create society administrator", async (values, controls) => {
+            if (!selectedSocietyId) {
+                showMessage(controls.message, "Select a society first.", "warning");
+                return;
+            }
+            if (!editingUserId && !values.password) {
+                showMessage(controls.message, "Enter the initial password for this account.", "warning");
+                return;
+            }
+            controls.submit.disabled = true;
+            const base = `/api/superadmin/societies/${encodeURIComponent(selectedSocietyId)}/admins`;
+            const body = editingUserId ? { fullName: values.fullName, email: values.email } : { fullName: values.fullName, email: values.email, password: values.password };
+            try {
+                await api(editingUserId ? `${base}/${encodeURIComponent(editingUserId)}` : base, { method: editingUserId ? "PUT" : "POST", body: JSON.stringify(body) });
+                showMessage(controls.message, editingUserId ? "Administrator updated." : "Administrator created.", "success");
+                resetAdminForm();
+                await refresh();
+            } catch (error) { showMessage(controls.message, error.message, "danger"); }
+            finally { controls.submit.disabled = false; }
+        }, { submitText: "Create administrator", onCancel: resetAdminForm });
+        adminForm.card.classList.add("mb-3");
+        portalWorkspace.append(adminForm.card, tableHost);
+
+        const renderTable = () => {
+            const table = tableForRows(rows, [["fullName", "Name"], ["email", "Email"], ["isActive", "Status"]], row => {
+                const actions = el("div", "portal-action-row justify-content-end");
+                const edit = el("button", "btn btn-sm btn-outline-secondary", "Edit");
+                edit.type = "button";
+                edit.addEventListener("click", () => {
+                    editingUserId = idOf(row, "admins");
+                    adminForm.card.querySelector("h3").textContent = "Edit society administrator";
+                    adminForm.submit.textContent = "Save changes";
+                    adminForm.cancel.hidden = false;
+                    adminForm.inputs.get("fullName").value = prop(row, "fullName") || "";
+                    adminForm.inputs.get("email").value = prop(row, "email") || "";
+                    adminForm.inputs.get("password").value = "";
+                    adminForm.card.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+                actions.append(edit);
+                const activeValue = prop(row, "isActive");
+                const active = activeValue === true || activeValue === 1 || String(activeValue).toLowerCase() === "true";
+                const status = el("button", `btn btn-sm ${active ? "btn-outline-danger" : "btn-outline-success"}`, active ? "Deactivate" : "Activate");
+                status.type = "button";
+                status.addEventListener("click", async () => {
+                    try {
+                        await api(`/api/superadmin/societies/${encodeURIComponent(selectedSocietyId)}/admins/${encodeURIComponent(idOf(row, "admins"))}/status`, { method: "PATCH", body: JSON.stringify({ isActive: !active }) });
+                        await refresh();
+                    } catch (error) { showMessage(portalMessage, error.message, "danger"); }
+                });
+                actions.append(status);
+                return actions;
+            });
+            tableHost.replaceChildren(table);
+        };
+
+        const refresh = async () => {
+            const value = societyInput.value.trim();
+            if (!value) {
+                showMessage(portalMessage, "Enter a society ID to load administrators.", "warning");
+                return;
+            }
+            selectedSocietyId = value;
+            clearMessage(portalMessage);
+            rows = [];
+            renderTable();
+            const result = await loadRows(`/api/superadmin/societies/${encodeURIComponent(value)}/admins`, portalMessage);
+            if (result !== null) rows = result;
+            renderTable();
+        };
+        loadButton.addEventListener("click", refresh);
+        reload.addEventListener("click", refresh);
+    }
+
+    function renderSubscriptions(page) {
+        const reload = pageShell(page, "Assign or update a society plan, review the current subscription, and change its status.");
+        const scopeCard = el("div", "portal-card p-3 mb-3");
+        const scopeRow = el("div", "row g-2 align-items-end");
+        const societyField = makeFieldInput(field("societyId", "Society ID", "number"));
+        societyField.wrapper.classList.add("col-12", "col-md-5");
+        const loadWrap = el("div", "col-12 col-md-auto");
+        const loadButton = el("button", "btn btn-outline-primary btn-sm", "Load subscription");
+        loadButton.type = "button";
+        loadWrap.append(loadButton);
+        scopeRow.append(societyField.wrapper, loadWrap);
+        scopeCard.append(scopeRow);
+        portalWorkspace.append(scopeCard);
+
+        let societyId = "";
+        let current = null;
+        const subscriptionFields = [field("subscriptionPlanId", "Subscription plan ID", "number"), field("startDate", "Start date", "datetime-local"), field("endDate", "End date", "datetime-local")];
+        const form = buildForm(subscriptionFields, "Assign a subscription", async (values, controls) => {
+            if (!societyId) {
+                showMessage(controls.message, "Load a society first.", "warning");
+                return;
+            }
+            controls.submit.disabled = true;
+            const body = { subscriptionPlanId: Number(values.subscriptionPlanId), startDate: values.startDate, endDate: values.endDate };
+            try {
+                await api(`/api/superadmin/societies/${encodeURIComponent(societyId)}/subscription`, { method: current ? "PUT" : "POST", body: JSON.stringify(body) });
+                showMessage(controls.message, current ? "Subscription updated." : "Subscription assigned.", "success");
+                await refresh();
+            } catch (error) { showMessage(controls.message, error.message, "danger"); }
+            finally { controls.submit.disabled = false; }
+        }, { submitText: "Assign subscription" });
+        portalWorkspace.append(form.card);
+
+        const statusForm = buildForm([field("status", "Subscription status"), field("isActive", "Active", "checkbox", false)], "Update subscription status", async (values, controls) => {
+            if (!societyId) {
+                showMessage(controls.message, "Load a society first.", "warning");
+                return;
+            }
+            controls.submit.disabled = true;
+            try {
+                await api(`/api/superadmin/societies/${encodeURIComponent(societyId)}/subscription/status`, { method: "PATCH", body: JSON.stringify({ status: values.status, isActive: values.isActive }) });
+                showMessage(controls.message, "Subscription status updated.", "success");
+                await refresh();
+            } catch (error) { showMessage(controls.message, error.message, "danger"); }
+            finally { controls.submit.disabled = false; }
+        }, { submitText: "Save status" });
+        portalWorkspace.append(statusForm.card);
+        const currentHost = el("div");
+        portalWorkspace.append(currentHost);
+
+        const refresh = async () => {
+            const value = societyField.input.value.trim();
+            if (!value) {
+                societyId = "";
+                current = null;
+                form.card.querySelector("h3").textContent = "Assign a subscription";
+                form.submit.textContent = "Assign subscription";
+                statusForm.card.hidden = true;
+                currentHost.replaceChildren();
+                showMessage(portalMessage, "Enter a society ID to load its subscription.", "warning");
+                return;
+            }
+            societyId = value;
+            clearMessage(portalMessage);
+            try {
+                const payload = await api(`/api/superadmin/societies/${encodeURIComponent(value)}/subscription`);
+                const data = dataOf(payload);
+                const found = Array.isArray(data) ? data : data && typeof data === "object" ? [data] : [];
+                current = found[0] || null;
+                statusForm.card.hidden = !current;
+                form.card.querySelector("h3").textContent = current ? "Update subscription" : "Assign a subscription";
+                form.submit.textContent = current ? "Save subscription" : "Assign subscription";
+                if (current) {
+                    for (const config of subscriptionFields) {
+                        const input = form.inputs.get(config.name);
+                        let fieldValue = prop(current, config.name);
+                        if (fieldValue && config.type === "datetime-local") fieldValue = String(fieldValue).slice(0, 16);
+                        input.value = fieldValue == null ? "" : String(fieldValue);
+                    }
+                    statusForm.inputs.get("status").value = prop(current, "status") || "";
+                    const activeValue = prop(current, "isActive");
+                    statusForm.inputs.get("isActive").checked = activeValue === true || activeValue === 1 || String(activeValue).toLowerCase() === "true";
+                    currentHost.replaceChildren(tableForRows([current], [["subscriptionPlanId", "Plan"], ["startDate", "Starts"], ["endDate", "Ends"], ["status", "Status"], ["isActive", "Active"]]));
+                } else {
+                    form.form.reset();
+                    currentHost.replaceChildren(el("div", "portal-card portal-empty", "No subscription was returned for this society yet."));
+                }
+            } catch (error) {
+                current = null;
+                statusForm.card.hidden = true;
+                form.card.querySelector("h3").textContent = "Assign a subscription";
+                form.submit.textContent = "Assign subscription";
+                form.form.reset();
+                currentHost.replaceChildren(el("div", "portal-card portal-empty", "No current subscription was found. You can assign one if this society is valid."));
+                showMessage(portalMessage, error.message, "warning");
+            }
+        };
+        loadButton.addEventListener("click", refresh);
+        reload.addEventListener("click", refresh);
+        statusForm.card.hidden = true;
+    }
+
     function renderAccess(page) {
         const reload = pageShell(page, "Review access activity, inspect issued amenity PINs, or validate a PIN at the gate.");
-        const validation = buildForm([field("amenityId", "Amenity ID", "number"), field("pin", "PIN")], "Validate amenity PIN", async (values, controls) => {
+        const validation = buildForm([field("amenityId", "Amenity ID", "number"), field("pin", "PIN (6 digits)", "text", true, { pattern: "[0-9]{6}", minLength: 6, maxLength: 6, inputMode: "numeric", title: "Enter the six digit PIN." })], "Validate amenity PIN", async (values, controls) => {
             controls.submit.disabled = true;
             try {
                 const payload = await api("/api/societyadmin/amenity-pins/validate", { method: "POST", body: JSON.stringify({ amenityId: Number(values.amenityId), pin: values.pin }) });
@@ -647,7 +915,7 @@
             selectedReport = report;
             clearMessage(portalMessage);
             if (button) button.disabled = true;
-            try { result.replaceChildren(tableForRows(rowsOf(await api(report.path)), null)); }
+            try { result.replaceChildren(tableForRows(reportRowsOf(await api(report.path)), null)); }
             catch (error) { showMessage(portalMessage, error.message, "danger"); result.replaceChildren(); }
             finally { if (button) button.disabled = false; }
         }

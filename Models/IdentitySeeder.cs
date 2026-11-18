@@ -39,6 +39,7 @@ namespace MTSS.Data
                 }
             }
 
+            // SUPER ADMIN CONFIGURATION
             var superAdminEmail = configuration["SuperAdmin:Email"];
             var superAdminPassword = configuration["SuperAdmin:Password"];
             var superAdminName = configuration["SuperAdmin:FullName"];
@@ -51,12 +52,12 @@ namespace MTSS.Data
                     "SuperAdmin configuration is missing.");
             }
 
-            var existingUser =
+            var superAdmin =
                 await userManager.FindByEmailAsync(superAdminEmail);
 
-            if (existingUser == null)
+            if (superAdmin == null)
             {
-                existingUser = new ApplicationUser
+                superAdmin = new ApplicationUser
                 {
                     UserName = superAdminEmail,
                     Email = superAdminEmail,
@@ -67,7 +68,7 @@ namespace MTSS.Data
                 };
 
                 var createResult = await userManager.CreateAsync(
-                    existingUser,
+                    superAdmin,
                     superAdminPassword);
 
                 if (!createResult.Succeeded)
@@ -80,44 +81,151 @@ namespace MTSS.Data
                         $"SuperAdmin creation failed: {errors}");
                 }
             }
-            else
+            else if (!await userManager.CheckPasswordAsync(
+                superAdmin, superAdminPassword))
             {
-                if (!await userManager.CheckPasswordAsync(
-                    existingUser, superAdminPassword))
+                var token =
+                    await userManager.GeneratePasswordResetTokenAsync(
+                        superAdmin);
+
+                var resetResult =
+                    await userManager.ResetPasswordAsync(
+                        superAdmin,
+                        token,
+                        superAdminPassword);
+
+                if (!resetResult.Succeeded)
                 {
-                    var token =
-                        await userManager.GeneratePasswordResetTokenAsync(
-                            existingUser);
+                    var errors = string.Join(
+                        "; ",
+                        resetResult.Errors.Select(e => e.Description));
 
-                    var resetResult =
-                        await userManager.ResetPasswordAsync(
-                            existingUser,
-                            token,
-                            superAdminPassword);
-
-                    if (!resetResult.Succeeded)
-                    {
-                        var errors = string.Join(
-                            "; ",
-                            resetResult.Errors.Select(e => e.Description));
-
-                        throw new InvalidOperationException(
-                            $"SuperAdmin password reset failed: {errors}");
-                    }
+                    throw new InvalidOperationException(
+                        $"SuperAdmin password reset failed: {errors}");
                 }
             }
 
             if (!await userManager.IsInRoleAsync(
-                existingUser, "SuperAdmin"))
+                superAdmin, "SuperAdmin"))
             {
                 var roleResult = await userManager.AddToRoleAsync(
-                    existingUser, "SuperAdmin");
+                    superAdmin, "SuperAdmin");
 
                 if (!roleResult.Succeeded)
                 {
                     throw new InvalidOperationException(
                         "Failed to assign SuperAdmin role.");
                 }
+            }
+
+            // SOCIETY ADMIN CONFIGURATION
+            var societyAdminEmail = configuration["SocietyAdmin:Email"];
+            var societyAdminPassword = configuration["SocietyAdmin:Password"];
+
+            if (!string.IsNullOrWhiteSpace(societyAdminEmail) &&
+                !string.IsNullOrWhiteSpace(societyAdminPassword))
+            {
+                var societyAdminName =
+                    configuration["SocietyAdmin:FullName"]
+                    ?? "Society Admin";
+
+                var societyAdmin =
+                    await userManager.FindByEmailAsync(societyAdminEmail);
+
+                if (societyAdmin == null)
+                {
+                    societyAdmin = new ApplicationUser
+                    {
+                        UserName = societyAdminEmail,
+                        Email = societyAdminEmail,
+                        FullName = societyAdminName,
+                        SocietyId = 1,
+                        IsActive = true,
+                        EmailConfirmed = true
+                    };
+
+                    var createResult = await userManager.CreateAsync(
+                        societyAdmin,
+                        societyAdminPassword);
+
+                    if (!createResult.Succeeded)
+                    {
+                        var errors = string.Join(
+                            "; ",
+                            createResult.Errors.Select(e => e.Description));
+
+                        throw new InvalidOperationException(
+                            $"SocietyAdmin creation failed: {errors}");
+                    }
+
+                    Console.WriteLine(
+                        "[Seeder] SocietyAdmin account created.");
+                }
+                else
+                {
+                    societyAdmin.FullName = societyAdminName;
+                    societyAdmin.SocietyId = 1;
+                    societyAdmin.IsActive = true;
+                    societyAdmin.EmailConfirmed = true;
+
+                    var updateResult =
+                        await userManager.UpdateAsync(societyAdmin);
+
+                    if (!updateResult.Succeeded)
+                    {
+                        var errors = string.Join(
+                            "; ",
+                            updateResult.Errors.Select(e => e.Description));
+
+                        throw new InvalidOperationException(
+                            $"SocietyAdmin update failed: {errors}");
+                    }
+
+                    if (!await userManager.CheckPasswordAsync(
+                        societyAdmin, societyAdminPassword))
+                    {
+                        var token =
+                            await userManager.GeneratePasswordResetTokenAsync(
+                                societyAdmin);
+
+                        var resetResult =
+                            await userManager.ResetPasswordAsync(
+                                societyAdmin,
+                                token,
+                                societyAdminPassword);
+
+                        if (!resetResult.Succeeded)
+                        {
+                            var errors = string.Join(
+                                "; ",
+                                resetResult.Errors.Select(e => e.Description));
+
+                            throw new InvalidOperationException(
+                                $"SocietyAdmin password reset failed: {errors}");
+                        }
+                    }
+                }
+
+                if (!await userManager.IsInRoleAsync(
+                    societyAdmin, "SocietyAdmin"))
+                {
+                    var roleResult = await userManager.AddToRoleAsync(
+                        societyAdmin, "SocietyAdmin");
+
+                    if (!roleResult.Succeeded)
+                    {
+                        throw new InvalidOperationException(
+                            "Failed to assign SocietyAdmin role.");
+                    }
+                }
+
+                Console.WriteLine(
+                    "[Seeder] SocietyAdmin setup completed.");
+            }
+            else
+            {
+                Console.WriteLine(
+                    "[Seeder] SocietyAdmin configuration missing. Skipped.");
             }
         }
     }

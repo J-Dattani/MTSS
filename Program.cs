@@ -64,8 +64,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-// MVC and API Controllers
-builder.Services.AddControllersWithViews();
+// API Controllers
+builder.Services.AddControllers();
+
+// Swagger Configuration
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Register Application Services
 builder.Services.AddScoped<SubscriptionPlanService>();
@@ -89,13 +93,10 @@ var app = builder.Build();
 // HTTP Pipeline
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
-app.UseStaticFiles();
 
 app.UseRouting();
 
@@ -106,13 +107,15 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+// Swagger - Development Environment
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 // API Attribute Routing
 app.MapControllers();
-
-// Default MVC Routing
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // Seed Identity Roles
 using (var scope = app.Services.CreateScope())

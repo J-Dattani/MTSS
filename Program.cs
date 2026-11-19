@@ -107,12 +107,9 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-// Swagger - Development Environment
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger - Available in Development and Production
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // API Attribute Routing
 app.MapControllers();

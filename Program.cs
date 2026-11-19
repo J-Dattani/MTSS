@@ -107,9 +107,97 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-// Swagger - Available in Development and Production
-app.UseSwagger();
-app.UseSwaggerUI();
+// Environment-specific pages
+if (app.Environment.IsDevelopment())
+{
+    // Swagger - Development Only
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    // Production Welcome Page
+    app.MapGet("/", () =>
+        Results.Content(
+            """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>MTSS Backend API</title>
+                <style>
+                    * {
+                        box-sizing: border-box;
+                    }
+
+                    body {
+                        margin: 0;
+                        min-height: 100vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-family: Arial, sans-serif;
+                        background: #f4f6f9;
+                        color: #1e293b;
+                    }
+
+                    .container {
+                        max-width: 520px;
+                        width: 90%;
+                        padding: 45px 30px;
+                        text-align: center;
+                        background: white;
+                        border-radius: 16px;
+                        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+                    }
+
+                    h1 {
+                        margin-bottom: 12px;
+                        color: #2563eb;
+                        font-size: 32px;
+                    }
+
+                    p {
+                        color: #64748b;
+                        line-height: 1.6;
+                    }
+
+                    .status {
+                        display: inline-block;
+                        margin-top: 18px;
+                        padding: 10px 18px;
+                        border-radius: 30px;
+                        background: #dcfce7;
+                        color: #15803d;
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+
+                    footer {
+                        margin-top: 35px;
+                        color: #94a3b8;
+                        font-size: 12px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>MTSS Backend API</h1>
+                    <p>Multi-Tenant Society Management System</p>
+                    <p>Backend service is running successfully.</p>
+                    <div class="status">
+                        Service Operational
+                    </div>
+                    <footer>
+                        MTSS Backend Service
+                    </footer>
+                </div>
+            </body>
+            </html>
+            """,
+            "text/html"));
+}
 
 // API Attribute Routing
 app.MapControllers();
